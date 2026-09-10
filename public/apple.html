@@ -153,8 +153,8 @@ function start(){
     if(i >= total) return;
     const { el, img } = cells[i];
     img.src = rotten.has(i)
-      ? 'https://logo12.gamer.gd/poi.png'
-      : 'https://logo12.gamer.gd/apple.png';
+      ? 'img/rotten.png'
+      : 'img/apple.png';
     el.classList.add('revealed');
     i++;
     setTimeout(step, 55);
