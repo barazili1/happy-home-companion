@@ -503,38 +503,7 @@ setInterval(() => {
     localStorage.setItem('onlineUserCount', userCount);
 }, 5000);
 
-// ========== عرض رسائل الخطأ كـ SweetAlert ==========
-
-// ========== تعبئة تلقائية ==========
-const pendingID = localStorage.getItem('pendingAutoFillID');
-const pendingCode = localStorage.getItem('pendingAutoFillCode');
-if (pendingID && pendingCode) {
-    document.getElementById('loginId').value = pendingID;
-    document.getElementById('activationCode').value = pendingCode;
-    localStorage.removeItem('pendingAutoFillID');
-    localStorage.removeItem('pendingAutoFillCode');
-    Swal.fire({
-        title: 'تم بنجاح',
-        text: 'تم ملء البيانات تلقائياً ✅',
-        icon: 'success',
-        timer: 2000,
-        showConfirmButton: false,
-        customClass: {
-            popup: 'mafya-swal',
-            title: 'mafya-swal-title',
-            htmlContainer: 'mafya-swal-html'
-        }
-    });
-}
-
-// ========== حفظ الايدي ==========
-const loginIdInput = document.getElementById('loginId');
-loginIdInput.addEventListener('input', () => {
-    localStorage.setItem('mafya_user_id', loginIdInput.value.trim());
-});
-document.getElementById('loginForm').addEventListener('submit', () => {
-    localStorage.setItem('mafya_user_id', loginIdInput.value.trim());
-});
+// ========== فيديو الشرح ==========
 
 // ========== فيديو الشرح ==========
 const VIDEO_LINK = 'yourvideolink';
