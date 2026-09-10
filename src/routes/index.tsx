@@ -1,8 +1,10 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { useEffect } from "react";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/")({
-  component: Index,
+  beforeLoad: () => {
+    throw redirect({ to: "/v.html" });
+  },
+  component: () => null,
   head: () => ({
     meta: [
       { title: "MAFYA - مرحباً" },
@@ -12,10 +14,3 @@ export const Route = createFileRoute("/")({
     ],
   }),
 });
-
-function Index() {
-  useEffect(() => {
-    window.location.replace("/v.html");
-  }, []);
-  return null;
-}
