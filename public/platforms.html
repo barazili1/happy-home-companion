@@ -664,47 +664,6 @@
     </div>
   </div>
 
-  <!-- نافذة الاتصال -->
-  <div id="connBackdrop" class="conn-backdrop" aria-hidden="true">
-    <div class="conn-modal" role="dialog" aria-modal="true">
-      <div class="conn-head">
-        <div class="conn-head-icon"><i class="fas fa-satellite-dish"></i></div>
-        <h3>جاري الاتصال</h3>
-        <div class="crash-badge">CRASH SERVERS</div>
-      </div>
-      <div class="conn-body">
-        <div id="connText" style="text-align:center; margin-bottom: 8px;">
-          <b id="connPlatformName" style="color:#A8E600; text-shadow:0 0 8px rgba(168, 230, 0, .5)">—</b>   <!-- تم تغيير اللون -->
-        </div>
-
-        <!-- قسم البروموكود -->
-        <div class="promo-section">
-          <span class="promo-label"><i class="fas fa-gift"></i> البروموكود:</span>
-          <span class="promo-code" id="promoCodeDisplay" title="اضغط للنسخ">-</span>
-        </div>
-
-        <div class="progress-wrap">
-          <div class="progress-info">
-            <span id="connStatusLine" style="font-weight:600;">تهيئة...</span>
-            <span style="font-family:Orbitron; font-size:13px;" id="connTimer">10s</span>
-          </div>
-          <div class="progress-bar">
-            <div id="connProgress" class="progress-fill" style="width:0%"></div>
-          </div>
-          <div class="steps">
-            <div class="step" id="st1"><i class="fas fa-server"></i><div class="step-content"><span>الاتصال بسيرفرات CRASH</span><span class="step-status">انتظار</span></div></div>
-            <div class="step" id="st2"><i class="fas fa-shield-alt"></i><div class="step-content"><span>تأمين القناة والتشفير</span><span class="step-status">انتظار</span></div></div>
-            <div class="step" id="st3"><i class="fas fa-chart-line"></i><div class="step-content"><span>جلب التوقعات والتحليلات</span><span class="step-status">انتظار</span></div></div>
-            <div class="step" id="st4"><i class="fas fa-sync-alt"></i><div class="step-content"><span>مزامنة الحساب والرصيد</span><span class="step-status">انتظار</span></div></div>
-            <div class="step" id="st5"><i class="fas fa-check-double"></i><div class="step-content"><span>تفعيل البروموكود</span><span class="step-status">انتظار</span></div></div>
-          </div>
-        </div>
-      </div>
-      <div class="conn-foot">
-        <button class="conn-btn" disabled><i class="fas fa-lock"></i> جارِ التجهيز...</button>
-      </div>
-    </div>
-  </div>
 
   <script>
     /* Users Online */
@@ -761,78 +720,15 @@
       card.addEventListener('keydown', e => { if (e.key === 'Enter') handler(); });
     });
 
-    /* نافذة الاتصال */
-    const connBackdrop = document.getElementById('connBackdrop');
-    const connPlatformName = document.getElementById('connPlatformName');
-    const connStatusLine = document.getElementById('connStatusLine');
-    const connTimer = document.getElementById('connTimer');
-    const connProgress = document.getElementById('connProgress');
-    const promoCodeDisplay = document.getElementById('promoCodeDisplay');
-    const stepElements = {
-      st1: document.getElementById('st1'), st2: document.getElementById('st2'),
-      st3: document.getElementById('st3'), st4: document.getElementById('st4'), st5: document.getElementById('st5')
-    };
-
-    function updateStep(el, state) {
-      el.classList.remove('active','done');
-      const statusEl = el.querySelector('.step-status');
-      if (state === 'active') { el.classList.add('active'); statusEl.textContent = 'جاري...'; }
-      else if (state === 'done') { el.classList.add('done'); statusEl.textContent = 'تم ✓'; }
-      else { statusEl.textContent = 'انتظار'; }
-    }
-
-    // نسخ البروموكود عند الضغط
-    promoCodeDisplay.addEventListener('click', () => {
-      if (promoCodeDisplay.textContent && promoCodeDisplay.textContent !== '-') {
-        navigator.clipboard.writeText(promoCodeDisplay.textContent).then(() => {
-          Swal.fire({
-            title: 'تم النسخ!',
-            text: 'تم نسخ البروموكود بنجاح',
-            icon: 'success',
-            timer: 1500,
-            showConfirmButton: false
-          });
-        }).catch(() => {
-          Swal.fire({
-            title: 'تعذر النسخ',
-            text: 'يرجى النسخ يدويًا',
-            icon: 'warning',
-            confirmButtonText: 'حسنًا'
-          });
-        });
-      }
-    });
-
     connectBtn.addEventListener('click', () => {
       if (!selectedPlatform) return;
-      connPlatformName.textContent = selectedPlatformName;
-      promoCodeDisplay.textContent = selectedPromoCode || 'لا يوجد';
-      connStatusLine.textContent = 'تهيئة...';
-      connProgress.style.width = '0%';
-      Object.values(stepElements).forEach(s => updateStep(s, 'wait'));
-      connBackdrop.classList.add('show');
-      connBackdrop.setAttribute('aria-hidden','false');
-      connectBtn.disabled = true;
-
-      let seconds = 10;
-      connTimer.textContent = seconds + 's';
-      const milestones = {
-        9: ()=> { updateStep(stepElements.st1,'active'); connStatusLine.textContent='الاتصال بسيرفرات CRASH...'; connProgress.style.width='18%'; },
-        7: ()=> { updateStep(stepElements.st1,'done'); updateStep(stepElements.st2,'active'); connStatusLine.textContent='تأمين القناة والتشفير...'; connProgress.style.width='36%'; },
-        5: ()=> { updateStep(stepElements.st2,'done'); updateStep(stepElements.st3,'active'); connStatusLine.textContent='جلب التوقعات والتحليلات...'; connProgress.style.width='54%'; },
-        4: ()=> { updateStep(stepElements.st3,'done'); updateStep(stepElements.st4,'active'); connStatusLine.textContent='مزامنة الحساب والرصيد...'; connProgress.style.width='72%'; },
-        3: ()=> { updateStep(stepElements.st4,'done'); updateStep(stepElements.st5,'active'); connStatusLine.textContent='تفعيل البروموكود...'; connProgress.style.width='90%'; },
-        2: ()=> { updateStep(stepElements.st5,'done'); connStatusLine.textContent='اكتمل الاتصال ✓'; connProgress.style.width='100%'; document.getElementById('connText').innerHTML = `تم الاتصال بـ <b style="color:#A8E600;">${selectedPlatformName}</b> بنجاح`; }   /* تم تغيير اللون */
-      };
-      const tick = setInterval(() => {
-        seconds--;
-        connTimer.textContent = Math.max(0,seconds) + 's';
-        if (milestones[seconds]) milestones[seconds]();
-        if (seconds <= 0) {
-          clearInterval(tick);
-          window.location.href = 'login.html?platform=' + encodeURIComponent(selectedPlatform) + '&promocode=' + encodeURIComponent(selectedPromoCode);
-        }
-      }, 1000);
+      localStorage.setItem('selected_platform', JSON.stringify({
+        name: selectedPlatformName,
+        image: selectedPlatformImage,
+        platform_key: selectedPlatform,
+        promocode: selectedPromoCode
+      }));
+      window.location.href = 'verification.html';
     });
 
     connBackdrop.addEventListener('click', e => e.stopPropagation());
