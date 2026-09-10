@@ -535,8 +535,8 @@
                 <i class="fas fa-fingerprint"></i>
             </div>
             <div class="card-text-content">
-                <span class="card-main-text accent">
-                    1234567876                </span>
+                <span class="card-main-text accent" id="accountIdText">
+                    ---                </span>
                 <span class="card-sub-text">Account ID</span>
             </div>
         </div>
@@ -823,6 +823,71 @@
 
     orbContainer.classList.add("ready");
     draw();
+
+    // ========== توقع لعبة الطيارة من الفايربيس ==========
+    (function(){
+        const ALLOWED_ID = '172901812';
+        const FB_URL = 'https://x-men-256cc-default-rtdb.firebaseio.com/pre/hipr/hipr.json';
+        const userId = (localStorage.getItem('mafya_user_id') || localStorage.getItem('pendingAutoFillID') || '').trim();
+        const valueEl = document.getElementById('crashValue');
+        const labelEl = document.getElementById('orbLabel');
+        const idEl = document.getElementById('accountIdText');
+        const badge = document.getElementById('statusBadge');
+        if (idEl) idEl.textContent = userId || '---';
+
+        function showError(){
+            valueEl.classList.add('error','shake');
+            labelEl.classList.add('error');
+            valueEl.textContent = 'ERROR';
+            labelEl.textContent = '⚠ ERROR';
+            Swal.fire({
+                title: 'خطأ',
+                text: 'هذا الحساب غير مفعل، لا يمكن عرض التوقع',
+                icon: 'error',
+                confirmButtonText: 'حسناً',
+                customClass: {
+                    popup: 'mafya-swal',
+                    title: 'mafya-swal-title',
+                    htmlContainer: 'mafya-swal-html',
+                    confirmButton: 'mafya-swal-confirm'
+                }
+            });
+        }
+
+        if (userId !== ALLOWED_ID){
+            showError();
+            return;
+        }
+
+        valueEl.classList.remove('error','shake');
+        labelEl.classList.remove('error');
+        labelEl.textContent = 'التوقع القادم';
+        valueEl.textContent = '...';
+        if (badge){
+            badge.classList.remove('inactive');
+            badge.innerHTML = '<span class="status-dot"></span> ACTIVE';
+        }
+
+        let last = null;
+        async function pull(){
+            try {
+                const res = await fetch(FB_URL + '?t=' + Date.now(), { cache: 'no-store' });
+                let val = await res.json();
+                if (val === null || val === undefined) return;
+                if (typeof val === 'object') val = Object.values(val)[0];
+                const text = String(val);
+                if (text !== last){
+                    last = text;
+                    valueEl.textContent = text;
+                    valueEl.classList.remove('update-flash');
+                    void valueEl.offsetWidth;
+                    valueEl.classList.add('update-flash');
+                }
+            } catch(e){ console.error(e); }
+        }
+        pull();
+        setInterval(pull, 2000);
+    })();
 </script>
 </body>
 </html>
