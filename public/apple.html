@@ -251,7 +251,9 @@ let lastSignature = null;
 
 async function start(){
   if(!isAllowed){
-    alertError();
+    const values = randomValues();
+    lastSignature = JSON.stringify(values);
+    revealValues(values);
     return;
   }
   try {
@@ -260,25 +262,24 @@ async function start(){
     revealValues(values);
   } catch(e){
     console.error(e);
-    alertError();
+    const values = randomValues();
+    lastSignature = JSON.stringify(values);
+    revealValues(values);
   }
 }
 
 async function restart(){
-  if(!isAllowed){
-    reset();
-    alertError();
-    return;
-  }
   const values = randomValues();
-  try {
-    await saveValues(values);
-  } catch(e){ console.error(e); }
+  if(isAllowed){
+    try {
+      await saveValues(values);
+    } catch(e){ console.error(e); }
+  }
   lastSignature = JSON.stringify(values);
   revealValues(values);
 }
 
-// تحديث تلقائي عند تغيّر التوقعات في الفايربيس
+// تحديث تلقائي عند تغيّر التوقعات في الفايربيس (للأدمن فقط)
 if (isAllowed){
   setInterval(async () => {
     try {
