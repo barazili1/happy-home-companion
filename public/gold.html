@@ -180,14 +180,23 @@ body{
   startBtn.addEventListener('click', () => {
     if (!count) return;
     const slots = slotsEl.querySelectorAll('.slot');
-    slots.forEach(s => s.classList.remove('revealed'));
-    slots.forEach((s, i) => {
-      setTimeout(() => s.classList.add('revealed'), 300 * (i + 1));
+    slots.forEach(s => {
+      s.classList.remove('revealed');
+      s.style.opacity = '0.35';
     });
+    const winner = Math.floor(Math.random() * count);
+    const chosen = slots[winner];
+    setTimeout(() => {
+      chosen.style.opacity = '1';
+      chosen.classList.add('revealed');
+    }, 400);
   });
 
   resetBtn.addEventListener('click', () => {
-    slotsEl.querySelectorAll('.slot').forEach(s => s.classList.remove('revealed'));
+    slotsEl.querySelectorAll('.slot').forEach(s => {
+      s.classList.remove('revealed');
+      s.style.opacity = '1';
+    });
   });
 })();
 </script>
