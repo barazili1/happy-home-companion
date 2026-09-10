@@ -720,48 +720,6 @@
       card.addEventListener('keydown', e => { if (e.key === 'Enter') handler(); });
     });
 
-    /* نافذة الاتصال */
-    const connBackdrop = document.getElementById('connBackdrop');
-    const connPlatformName = document.getElementById('connPlatformName');
-    const connStatusLine = document.getElementById('connStatusLine');
-    const connTimer = document.getElementById('connTimer');
-    const connProgress = document.getElementById('connProgress');
-    const promoCodeDisplay = document.getElementById('promoCodeDisplay');
-    const stepElements = {
-      st1: document.getElementById('st1'), st2: document.getElementById('st2'),
-      st3: document.getElementById('st3'), st4: document.getElementById('st4'), st5: document.getElementById('st5')
-    };
-
-    function updateStep(el, state) {
-      el.classList.remove('active','done');
-      const statusEl = el.querySelector('.step-status');
-      if (state === 'active') { el.classList.add('active'); statusEl.textContent = 'جاري...'; }
-      else if (state === 'done') { el.classList.add('done'); statusEl.textContent = 'تم ✓'; }
-      else { statusEl.textContent = 'انتظار'; }
-    }
-
-    // نسخ البروموكود عند الضغط
-    promoCodeDisplay.addEventListener('click', () => {
-      if (promoCodeDisplay.textContent && promoCodeDisplay.textContent !== '-') {
-        navigator.clipboard.writeText(promoCodeDisplay.textContent).then(() => {
-          Swal.fire({
-            title: 'تم النسخ!',
-            text: 'تم نسخ البروموكود بنجاح',
-            icon: 'success',
-            timer: 1500,
-            showConfirmButton: false
-          });
-        }).catch(() => {
-          Swal.fire({
-            title: 'تعذر النسخ',
-            text: 'يرجى النسخ يدويًا',
-            icon: 'warning',
-            confirmButtonText: 'حسنًا'
-          });
-        });
-      }
-    });
-
     connectBtn.addEventListener('click', () => {
       if (!selectedPlatform) return;
       localStorage.setItem('selected_platform', JSON.stringify({
