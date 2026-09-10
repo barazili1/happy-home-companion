@@ -89,18 +89,19 @@ body{
 }
 
 .slots{
-  display:flex;gap:12px;justify-content:center;flex-wrap:wrap;
+  display:flex;gap:12px;justify-content:center;flex-wrap:nowrap;
+  width:100%;
   min-height:50px;
 }
 .slot{
-  width:150px;height:50px;
+  flex:1;max-width:150px;height:50px;
   border-radius:12px;
   border:1px solid rgba(168,230,0,.35);
   background:linear-gradient(160deg,rgba(255,255,255,.07),rgba(5,11,46,.8));
   box-shadow:inset 0 0 10px rgba(0,0,0,.35),0 0 12px rgba(168,230,0,.08);
   display:flex;align-items:center;justify-content:center;
   overflow:hidden;
-  transition:transform .3s ease, box-shadow .3s ease;
+  transition:transform .3s ease, box-shadow .3s ease, opacity .3s ease;
 }
 .slot.revealed{transform:scale(1.04);box-shadow:0 0 18px rgba(255,200,0,.45);border-color:rgba(255,200,0,.6)}
 .slot img{width:44px;height:44px;object-fit:contain;opacity:0;transition:opacity .35s ease}
@@ -180,14 +181,23 @@ body{
   startBtn.addEventListener('click', () => {
     if (!count) return;
     const slots = slotsEl.querySelectorAll('.slot');
-    slots.forEach(s => s.classList.remove('revealed'));
-    slots.forEach((s, i) => {
-      setTimeout(() => s.classList.add('revealed'), 300 * (i + 1));
+    slots.forEach(s => {
+      s.classList.remove('revealed');
+      s.style.opacity = '0.35';
     });
+    const winner = Math.floor(Math.random() * count);
+    const chosen = slots[winner];
+    setTimeout(() => {
+      chosen.style.opacity = '1';
+      chosen.classList.add('revealed');
+    }, 400);
   });
 
   resetBtn.addEventListener('click', () => {
-    slotsEl.querySelectorAll('.slot').forEach(s => s.classList.remove('revealed'));
+    slotsEl.querySelectorAll('.slot').forEach(s => {
+      s.classList.remove('revealed');
+      s.style.opacity = '1';
+    });
   });
 })();
 </script>
