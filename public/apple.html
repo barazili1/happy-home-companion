@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>MAFYA - لعبة التفاحة</title>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Almarai:wght@400;700;800&family=Orbitron:wght@700;900&family=Cinzel:wght@700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --primary:#050B2E;
+  --accent:#A8E600;
+  --accent2:#7CB800;
+  --border:rgba(168,230,0,.28);
+}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Almarai',sans-serif}
+html,body{width:100%;min-height:100%;background:var(--primary);color:#fff;overflow-x:hidden}
+body{
+  min-height:100dvh;
+  background:var(--primary) url('back.gif') no-repeat center center/cover;
+  background-attachment:fixed;
+  display:flex;flex-direction:column;align-items:center;
+  padding: calc(14px + env(safe-area-inset-top)) 12px calc(14px + env(safe-area-inset-bottom));
+  position:relative;
+}
+.overlay{position:fixed;inset:0;background:linear-gradient(180deg,rgba(5,11,46,.35),rgba(5,11,46,.75));z-index:0;pointer-events:none}
+.grid-bg{position:fixed;inset:0;background-image:linear-gradient(rgba(168,230,0,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(168,230,0,.04) 1px,transparent 1px);background-size:40px 40px;z-index:0;pointer-events:none}
+
+.wrap{position:relative;z-index:2;width:100%;max-width:420px;display:flex;flex-direction:column;align-items:center;gap:16px}
+.header{
+  width:100%;
+  display:flex;align-items:center;justify-content:space-between;gap:8px;
+}
+.back-btn{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:8px 12px;border-radius:999px;
+  background:rgba(5,11,46,.55);border:1px solid var(--border);
+  color:#fff;font-weight:800;font-size:12px;text-decoration:none;
+}
+.title{
+  font-family:'Cinzel','Orbitron',sans-serif;
+  font-weight:900;letter-spacing:.5px;font-size:18px;
+  color:#fff;text-shadow:0 0 14px rgba(168,230,0,.45);
+}
+
+.card{
+  width:100%;
+  border-radius:20px;
+  border:1px solid rgba(168,230,0,.35);
+  background:rgba(5,11,46,.55);
+  backdrop-filter:blur(14px);
+  padding:16px;
+  box-shadow:0 16px 45px rgba(0,0,0,.5),0 0 30px rgba(168,230,0,.12);
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(5,40px);
+  grid-auto-rows:40px;
+  gap:8px;
+  justify-content:center;
+  margin:6px auto 14px;
+}
+.cell{
+  width:40px;height:40px;border-radius:50%;
+  background-image:url('https://logo12.gamer.gd/cvb.png');
+  background-size:cover;background-position:center;
+  border:1px solid rgba(168,230,0,.35);
+  box-shadow:inset 0 0 8px rgba(0,0,0,.35),0 0 10px rgba(168,230,0,.08);
+  display:flex;align-items:center;justify-content:center;
+  overflow:hidden;position:relative;
+  transition:transform .3s ease, box-shadow .3s ease;
+}
+.cell.revealed{transform:scale(1.06);box-shadow:0 0 14px rgba(168,230,0,.35)}
+.cell img{width:78%;height:78%;object-fit:contain;opacity:0;transition:opacity .3s ease}
+.cell.revealed img{opacity:1}
+
+.actions{display:flex;gap:10px;margin-top:6px}
+.btn{
+  flex:1;border:0;cursor:pointer;
+  padding:12px 14px;border-radius:14px;font-weight:900;font-size:14px;
+  transition:transform .12s ease, filter .12s ease, box-shadow .12s ease;
+}
+.btn:active{transform:scale(.98)}
+.btn-primary{
+  color:#111;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  box-shadow:0 10px 28px rgba(168,230,0,.3);
+  border:1px solid rgba(168,230,0,.6);
+}
+.btn-ghost{
+  color:#fff;background:rgba(5,11,46,.55);border:1px solid var(--border);
+}
+</style>
+</head>
+<body>
+<div class="overlay"></div>
+<div class="grid-bg"></div>
+
+<div class="wrap">
+  <div class="header">
+    <a class="back-btn" href="verification.html?games=1"><i class="fas fa-arrow-right"></i> رجوع</a>
+    <div class="title">لعبة التفاحة 🍎</div>
+    <span style="width:1px"></span>
+  </div>
+
+  <div class="card">
+    <div class="grid" id="grid"></div>
+    <div class="actions">
+      <button class="btn btn-primary" id="startBtn"><i class="fas fa-play"></i> بدء</button>
+      <button class="btn btn-ghost" id="resetBtn"><i class="fas fa-redo"></i> إعادة بدء</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const ROWS = 10, COLS = 5;
+const grid = document.getElementById('grid');
+const cells = [];
+
+function buildGrid(){
+  grid.innerHTML = '';
+  cells.length = 0;
+  for(let i = 0; i < ROWS * COLS; i++){
+    const c = document.createElement('div');
+    c.className = 'cell';
+    const img = document.createElement('img');
+    c.appendChild(img);
+    grid.appendChild(c);
+    cells.push({ el: c, img });
+  }
+}
+
+function reset(){
+  cells.forEach(({el, img}) => {
+    el.classList.remove('revealed');
+    img.removeAttribute('src');
+  });
+}
+
+function start(){
+  reset();
+  const total = ROWS * COLS;
+  // ~20% rotten apples random
+  const rotten = new Set();
+  const rottenCount = Math.floor(total * 0.22);
+  while(rotten.size < rottenCount){
+    rotten.add(Math.floor(Math.random() * total));
+  }
+
+  let i = 0;
+  const step = () => {
+    if(i >= total) return;
+    const { el, img } = cells[i];
+    img.src = rotten.has(i)
+      ? 'https://logo12.gamer.gd/poi.png'
+      : 'https://logo12.gamer.gd/apple.png';
+    el.classList.add('revealed');
+    i++;
+    setTimeout(step, 55);
+  };
+  step();
+}
+
+buildGrid();
+document.getElementById('startBtn').addEventListener('click', start);
+document.getElementById('resetBtn').addEventListener('click', () => { reset(); });
+</script>
+</body>
+</html>

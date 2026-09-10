@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover">
+    <title>MAFYA - تسجيل الدخول</title>
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Almarai:wght@400;700;800&family=Orbitron:wght@400;700;900&family=Cinzel:wght@400;700;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <style>
+        :root{
+            --primary: #050B2E;
+            --accent:#A8E600;                              /* تم تغيير اللون */
+            --accent2:#7CB800;                              /* تم تغيير اللون */
+            --w:#fff;
+            --text: rgba(255,255,255,.92);
+            --muted: rgba(255,255,255,.70);
+            --border: rgba(168, 230, 0, .25);               /* تم تغيير اللون */
+            --shadow: rgba(0,0,0,.45);
+            --ok:#35d07f;
+            --bad:#ff4d4d;
+            --r: 16px;
+        }
+
+        *{
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+            font-family: 'Almarai', ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Tahoma, Arial;
+        }
+
+        html,body{
+            width:100%;
+            min-height:100%;
+            overflow-x:hidden;
+            overflow-y:auto;
+            -webkit-text-size-adjust:100%;
+            background: var(--primary);
+        }
+
+        body{
+            min-height:100dvh;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            background: var(--primary) url("back.gif") no-repeat center center/cover;
+            color:var(--w);
+            padding: 12px;
+            padding-top: calc(12px + env(safe-area-inset-top));
+            padding-bottom: calc(12px + env(safe-area-inset-bottom));
+            position:relative;
+        }
+
+        .overlay{
+            position:fixed;
+            inset:0;
+            background:
+                radial-gradient(900px 520px at 50% 30%, rgba(168, 230, 0, .16), transparent 60%),   /* تم تغيير اللون */
+                radial-gradient(700px 420px at 20% 20%, rgba(168, 230, 0, .10), transparent 60%),   /* تم تغيير اللون */
+                linear-gradient(180deg, rgba(5,11,46,.30), rgba(5,11,46,.65));
+            backdrop-filter: blur(2px);
+            z-index:0;
+            pointer-events:none;
+        }
+
+        .grid-bg {
+            position:fixed;
+            inset:0;
+            background-image:
+                linear-gradient(rgba(168, 230, 0, 0.04) 1px, transparent 1px),   /* تم تغيير اللون */
+                linear-gradient(90deg, rgba(168, 230, 0, 0.04) 1px, transparent 1px);   /* تم تغيير اللون */
+            background-size:40px 40px;
+            animation: gridMove 20s linear infinite;
+            z-index:0;
+            pointer-events:none;
+        }
+        @keyframes gridMove {
+            0% { background-position:0 0,0 0; }
+            100% { background-position:40px 40px,40px 40px; }
+        }
+
+        .top-bar{
+            position:fixed;
+            top: max(10px, env(safe-area-inset-top));
+            left:0;
+            right:0;
+            padding: 0 12px;
+            display:flex;
+            justify-content:space-between;
+            gap:10px;
+            direction:ltr;
+            z-index:5;
+            font-size: 12px;
+        }
+        .pill{
+            display:flex;
+            align-items:center;
+            gap:7px;
+            padding: 8px 12px;
+            border-radius: 999px;
+            background: rgba(5,11,46,.55);
+            border: 1px solid var(--border);
+            backdrop-filter: blur(10px);
+            white-space:nowrap;
+            max-width: 48vw;
+            box-shadow: 0 0 16px rgba(168, 230, 0, .12);   /* تم تغيير اللون */
+            font-family: 'Cinzel', 'Orbitron', sans-serif;
+            letter-spacing: .5px;
+        }
+        .dot{
+            width:9px;
+            height:9px;
+            border-radius:50%;
+            background:var(--accent);
+            box-shadow:0 0 14px rgba(168, 230, 0, .85);   /* تم تغيير اللون */
+            animation:pulse 1.2s ease-in-out infinite;
+            flex:0 0 auto;
+        }
+        @keyframes pulse{
+            0%,100%{transform:scale(1);opacity:.85}
+            50%{transform:scale(1.35);opacity:1}
+        }
+        .value{
+            color:var(--accent);
+            font-weight:900;
+            min-width:38px;
+            text-align:right;
+            direction:ltr;
+            overflow:hidden;
+            text-overflow:ellipsis;
+            text-shadow:0 0 12px rgba(168, 230, 0, .35);   /* تم تغيير اللون */
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        .card{
+            position:relative;
+            z-index:2;
+            width: min(92vw, 420px);
+            border-radius: 24px;
+            border: 1px solid rgba(168, 230, 0, .35);   /* تم تغيير اللون */
+            background: rgba(5,11,46,.55);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            box-shadow:
+                0 20px 60px rgba(0,0,0,.5),
+                0 0 30px rgba(168, 230, 0, .15),   /* تم تغيير اللون */
+                inset 0 1px 0 rgba(255,255,255,.12);
+            padding: 20px 18px;
+            margin-top: 56px;
+            transition: transform .3s ease, box-shadow .3s ease;
+        }
+        .card:hover{
+            transform: translateY(-2px);
+            box-shadow:
+                0 25px 70px rgba(0,0,0,.55),
+                0 0 40px rgba(168, 230, 0, .22),   /* تم تغيير اللون */
+                inset 0 1px 0 rgba(255,255,255,.15);
+        }
+
+        .brand{
+            display:flex;
+            flex-direction:column;
+            align-items:center;
+            gap:8px;
+            margin-bottom: 16px;
+            text-align:center;
+        }
+        .logo{
+            width: 100px;
+            max-width: 35vw;
+            filter: drop-shadow(0 0 18px rgba(168, 230, 0, .4));   /* تم تغيير اللون */
+            animation: float 3s ease-in-out infinite;
+        }
+        @keyframes float{
+            0%,100%{transform:translateY(0)}
+            50%{transform:translateY(-6px)}
+        }
+        .title{
+            font-weight: 900;
+            letter-spacing: .8px;
+            font-size: 18px;
+            color: rgba(255,255,255,.95);
+            font-family: "Cinzel", "Orbitron", sans-serif;
+            text-shadow: 0 0 14px rgba(168, 230, 0, .4);   /* تم تغيير اللون */
+        }
+
+        .form{
+            display:flex;
+            flex-direction:column;
+            gap: 12px;
+            margin-top: 8px;
+        }
+        .field{
+            display:flex;
+            align-items:center;
+            gap:12px;
+            padding: 12px 14px;
+            border-radius: var(--r);
+            background: rgba(5,11,46,.45);
+            border: 1px solid rgba(168, 230, 0, .25);   /* تم تغيير اللون */
+            transition: border-color 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .field::before{
+            content:'';
+            position:absolute;
+            top:0; left:0; right:0; bottom:0;
+            background: linear-gradient(135deg, rgba(168, 230, 0, .06), transparent 50%);   /* تم تغيير اللون */
+            pointer-events:none;
+            z-index:-1;
+        }
+        .field:focus-within{
+            border-color: rgba(168, 230, 0, .65);   /* تم تغيير اللون */
+            box-shadow: 0 0 20px rgba(168, 230, 0, .25);   /* تم تغيير اللون */
+            background: rgba(5,11,46,.65);
+        }
+        .ic{
+            width:42px;
+            height:42px;
+            border-radius: 12px;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            background: rgba(168, 230, 0, .18);   /* تم تغيير اللون */
+            border: 1px solid rgba(168, 230, 0, .3);   /* تم تغيير اللون */
+            color: var(--accent);
+            font-weight: 900;
+            font-size: 16px;
+            flex: 0 0 auto;
+            user-select:none;
+            direction:ltr;
+            font-family:"Orbitron","Cinzel";
+            box-shadow: 0 0 14px rgba(168, 230, 0, .12);   /* تم تغيير اللون */
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .field:focus-within .ic{
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(168, 230, 0, .3);   /* تم تغيير اللون */
+        }
+        .input{
+            width:100%;
+            background:transparent;
+            border:0;
+            outline:0;
+            color: #fff;
+            font-size: 16px;
+            padding: 6px 0;
+            direction:ltr;
+            font-family:"Cinzel","Orbitron",monospace;
+            letter-spacing: .5px;
+        }
+        .input::placeholder{
+            color: rgba(255,255,255,.50);
+            font-family: 'Almarai', sans-serif;
+            font-size: 14px;
+            letter-spacing: 0;
+        }
+
+        .btn{
+            border:0;
+            cursor:pointer;
+            border-radius: 14px;
+            padding: 14px 18px;
+            font-weight: 900;
+            letter-spacing:.8px;
+            width:100%;
+            font-size: 16px;
+            transition: transform .2s ease, box-shadow .2s ease, filter .2s ease, background .2s ease;
+            position: relative;
+            overflow: hidden;
+            font-family: 'Almarai', sans-serif;
+        }
+        .btn:active{
+            transform: scale(.97);
+        }
+        .btn-primary{
+            color:#0a0f14;
+            background: linear-gradient(135deg, #A8E600 0%, #7CB800 100%);   /* تم تغيير اللون */
+            box-shadow: 0 10px 28px rgba(168, 230, 0, .3);   /* تم تغيير اللون */
+            margin-top: 4px;
+            border: 1px solid rgba(168, 230, 0, .6);   /* تم تغيير اللون */
+            text-shadow: 0 1px 1px rgba(255,255,255,.2);
+        }
+        .btn-primary:hover{
+            filter: brightness(1.1);
+            box-shadow: 0 14px 36px rgba(168, 230, 0, .45);   /* تم تغيير اللون */
+            transform: translateY(-1px);
+        }
+        .btn-primary::after{
+            content: '';
+            position: absolute;
+            top: -30%;
+            left: -30%;
+            width: 160%;
+            height: 160%;
+            background: radial-gradient(circle, rgba(255,255,255,.3) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+        }
+        .btn-primary:hover::after{
+            opacity: 1;
+        }
+
+        .links{
+            margin-top: 14px;
+            display:flex;
+            flex-direction:column;
+            gap: 10px;
+        }
+        .link-btn{
+            text-decoration:none;
+            border-radius: 14px;
+            padding: 12px 14px;
+            background: rgba(5,11,46,.45);
+            border: 1px solid rgba(168, 230, 0, .22);   /* تم تغيير اللون */
+            color: rgba(255,255,255,.90);
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            gap: 10px;
+            transition: transform .15s ease, border-color .15s ease, background .15s ease, box-shadow .15s ease;
+            font-family: 'Almarai', sans-serif;
+        }
+        .link-btn:hover{
+            border-color: rgba(168, 230, 0, .4);   /* تم تغيير اللون */
+            background: rgba(5,11,46,.6);
+            box-shadow: 0 0 18px rgba(168, 230, 0, .12);   /* تم تغيير اللون */
+            transform: translateX(-2px);
+        }
+        .link-btn:active{
+            transform: scale(.99);
+        }
+        .link-name{
+            font-weight: 800;
+            font-size: 13px;
+            white-space:nowrap;
+            overflow:hidden;
+            text-overflow:ellipsis;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .link-name i{
+            font-size: 16px;
+            width: 20px;
+            text-align: center;
+        }
+        .chip{
+            font-size: 11px;
+            font-weight: 900;
+            padding: 5px 10px;
+            border-radius: 999px;
+            border: 1px solid rgba(168, 230, 0, .25);   /* تم تغيير اللون */
+            background: rgba(168, 230, 0, .18);   /* تم تغيير اللون */
+            color: var(--accent);
+            direction:ltr;
+            flex: 0 0 auto;
+            font-family:"Orbitron","Cinzel";
+            box-shadow: 0 0 14px rgba(168, 230, 0, .1);   /* تم تغيير اللون */
+            letter-spacing: .5px;
+        }
+
+        /* تنسيق SweetAlert */
+        .swal2-popup.mafya-swal {
+            border-radius: 20px !important;
+            border: 1px solid rgba(168, 230, 0, .45) !important;   /* تم تغيير اللون */
+            background: radial-gradient(circle at 15% 0%, rgba(168, 230, 0, .18), transparent 45%), linear-gradient(180deg, rgba(5,11,46,.95), rgba(5,11,46,.98)) !important;   /* تم تغيير اللون */
+            box-shadow: 0 0 40px rgba(168, 230, 0, .2), 0 25px 60px rgba(0,0,0,.8) !important;   /* تم تغيير اللون */
+            padding: 18px !important;
+        }
+        .swal2-title.mafya-swal-title {
+            font-family: 'Cinzel', 'Orbitron', sans-serif !important;
+            font-size: 18px !important;
+            color: #fff !important;
+            text-shadow: 0 0 10px rgba(168, 230, 0, .6);   /* تم تغيير اللون */
+            letter-spacing: .5px;
+        }
+        .swal2-html-container.mafya-swal-html {
+            font-family: 'Almarai', sans-serif !important;
+            font-size: 15px !important;
+            color: rgba(255,255,255,.9) !important;
+            line-height: 1.7;
+        }
+        .swal2-confirm.mafya-swal-confirm {
+            background: linear-gradient(45deg, var(--accent), var(--accent2)) !important;   /* يستخدم المتغيرات المحدثة */
+            border-radius: 12px !important;
+            font-weight: 900 !important;
+            color: #000 !important;
+            padding: 10px 20px !important;
+            box-shadow: 0 0 15px rgba(168, 230, 0, .5) !important;   /* تم تغيير اللون */
+            font-family: 'Almarai', sans-serif;
+        }
+        .swal2-icon.swal2-error {
+            border-color: #ff4d4d !important;
+            color: #ff4d4d !important;
+        }
+        .swal2-icon.swal2-warning {
+            border-color: #ffaa00 !important;
+            color: #ffaa00 !important;
+        }
+    </style>
+</head>
+
+<body oncontextmenu="return true;">
+<div class="overlay"></div>
+<div class="grid-bg"></div>
+
+
+<div class="top-bar">
+    <div class="pill">
+        <span class="dot"></span>
+        Users Online:
+        <span id="loginUserCount" class="value">100</span>
+    </div>
+    <div class="pill">
+        version:
+        <span class="value">1.0.0</span>
+    </div>
+</div>
+
+<main class="card" role="main" aria-label="Login Card">
+    <div class="brand">
+        <img class="logo" src="logo.png" alt="MAFYA Logo">
+        <div class="title">تسجيل الدخول</div>
+    </div>
+
+    <form class="form" method="post" action="" id="loginForm" autocomplete="off">
+        <!-- حقل الإيدي - أي قيمة مقبولة (حتى فارغة) -->
+        <div class="field">
+            <div class="ic"><i class="fas fa-user"></i></div>
+            <input class="input" id="loginId" name="userId" type="text" placeholder="Your ID Account ?">
+        </div>
+
+        <div class="field">
+            <div class="ic"><i class="fas fa-key"></i></div>
+            <input class="input" id="activationCode" name="activationCode" type="password" placeholder="Activation Code ?" required>
+        </div>
+
+        <button class="btn btn-primary" type="submit">
+            <i class="fas fa-sign-in-alt" style="margin-left: 6px;"></i> تسجيل الدخول
+        </button>
+    </form>
+
+    <div class="links">
+        <a class="link-btn" href="#" id="videoBtn">
+            <div class="link-name">
+                <i class="fab fa-youtube" style="color: #FF0000;"></i> فيديو الشرح
+            </div>
+            <div class="chip">WATCH</div>
+        </a>
+
+        <a class="link-btn" href="https://t.me/TOPx111m" target="_blank" rel="noopener">
+            <div class="link-name">
+                <i class="fab fa-telegram-plane" style="color: #0088cc;"></i> التواصل مع المطوّر
+            </div>
+            <div class="chip">OPEN</div>
+        </a>
+
+        <a class="link-btn" href="https://t.me/+oph94sXSrFFlODVk" target="_blank" rel="noopener">
+            <div class="link-name">
+                <i class="fab fa-telegram-plane" style="color: #0088cc;"></i> قناتنا على التليجرام
+            </div>
+            <div class="chip">OPEN</div>
+        </a>
+
+
+        <a class="link-btn" href="verification.html?platform=Azimutbet&promocode=Gooo33">
+            <div class="link-name">
+                <i class="fas fa-gift" style="color: #ffaa00;"></i> أخذ كود التفعيل مجاني
+            </div>
+            <div class="chip">GO</div>
+        </a>
+    </div>
+</main>
+
+<script>
+let userCount = parseInt(localStorage.getItem('onlineUserCount')) || 100;
+document.getElementById('loginUserCount').innerText = userCount;
+setInterval(() => {
+    userCount++;
+    document.getElementById('loginUserCount').innerText = userCount;
+    localStorage.setItem('onlineUserCount', userCount);
+}, 5000);
+
+// ========== عرض رسائل الخطأ كـ SweetAlert ==========
+
+// ========== تعبئة تلقائية ==========
+const pendingID = localStorage.getItem('pendingAutoFillID');
+const pendingCode = localStorage.getItem('pendingAutoFillCode');
+if (pendingID && pendingCode) {
+    document.getElementById('loginId').value = pendingID;
+    document.getElementById('activationCode').value = pendingCode;
+    localStorage.removeItem('pendingAutoFillID');
+    localStorage.removeItem('pendingAutoFillCode');
+    Swal.fire({
+        title: 'تم بنجاح',
+        text: 'تم ملء البيانات تلقائياً ✅',
+        icon: 'success',
+        timer: 2000,
+        showConfirmButton: false,
+        customClass: {
+            popup: 'mafya-swal',
+            title: 'mafya-swal-title',
+            htmlContainer: 'mafya-swal-html'
+        }
+    });
+}
+</script>
+</body>
+</html>
