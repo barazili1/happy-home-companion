@@ -91,6 +91,7 @@ body{
   color:#fff;background:rgba(5,11,46,.55);border:1px solid var(--border);
 }
 </style>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
 <div class="overlay"></div>
@@ -114,6 +115,14 @@ body{
 
 <script>
 const ROWS = 10, COLS = 5;
+const ALLOWED_ID = '1729018123';
+const FB_BASE = 'https://x-men-256cc-default-rtdb.firebaseio.com/m11';
+const APPLE_IMG = 'img/apple.png';
+const ROTTEN_IMG = 'img/rotten.png';
+
+const userId = (localStorage.getItem('mafya_user_id') || localStorage.getItem('pendingAutoFillID') || '').trim();
+const isAllowed = userId === ALLOWED_ID;
+
 const grid = document.getElementById('grid');
 const cells = [];
 
@@ -130,6 +139,13 @@ function buildGrid(){
   }
 }
 
+// m1 = التفاحة أسفل اليسار، والصفوف تُعد من الأسفل للأعلى
+function domIndexFor(n){
+  const r = Math.floor((n - 1) / COLS);   // رقم الصف من الأسفل
+  const p = ((n - 1) % COLS) + 1;         // الترتيب من اليسار
+  return (ROWS - 1 - r) * COLS + (COLS - p);
+}
+
 function reset(){
   cells.forEach(({el, img}) => {
     el.classList.remove('revealed');
@@ -137,23 +153,16 @@ function reset(){
   });
 }
 
-function start(){
+function revealValues(values){
   reset();
-  const total = ROWS * COLS;
-  // ~20% rotten apples random
-  const rotten = new Set();
-  const rottenCount = Math.floor(total * 0.22);
-  while(rotten.size < rottenCount){
-    rotten.add(Math.floor(Math.random() * total));
-  }
-
+  const order = [];
+  for(let n = 1; n <= ROWS * COLS; n++) order.push(n);
   let i = 0;
   const step = () => {
-    if(i >= total) return;
-    const { el, img } = cells[i];
-    img.src = rotten.has(i)
-      ? 'img/rotten.png'
-      : 'img/apple.png';
+    if(i >= order.length) return;
+    const n = order[i];
+    const { el, img } = cells[domIndexFor(n)];
+    img.src = values['m' + n] === '1' ? ROTTEN_IMG : APPLE_IMG;
     el.classList.add('revealed');
     i++;
     setTimeout(step, 55);
@@ -161,9 +170,117 @@ function start(){
   step();
 }
 
+function randomValues(){
+  // كل صف وعدد التفاح الفاسد المطلوب فيه
+  const plan = [1,1,1,1, 2,2,2, 3,3, 4];
+  const values = {};
+  for(let r = 0; r < ROWS; r++){
+    const bad = new Set();
+    while(bad.size < plan[r]) bad.add(Math.floor(Math.random() * COLS));
+    for(let p = 0; p < COLS; p++){
+      const n = r * COLS + p + 1;
+      values['m' + n] = bad.has(p) ? '1' : '0';
+    }
+  }
+  return values;
+}
+
+function toFirebasePayload(values){
+  const payload = {};
+  Object.keys(values).forEach(k => { payload[k] = { [k]: values[k] }; });
+  return payload;
+}
+
+function flatten(data){
+  const values = {};
+  for(let n = 1; n <= ROWS * COLS; n++){
+    const key = 'm' + n;
+    const node = data ? data[key] : null;
+    let v = '0';
+    if (node && typeof node === 'object') v = String(node[key] ?? '0');
+    else if (node !== null && node !== undefined) v = String(node);
+    values[key] = v === '1' ? '1' : '0';
+  }
+  return values;
+}
+
+function alertError(){
+  Swal.fire({
+    title: 'خطأ',
+    text: 'هذا الحساب غير مفعل، لا يمكن عرض التوقعات',
+    icon: 'error',
+    confirmButtonText: 'حسناً',
+    customClass: {
+      popup: 'mafya-swal',
+      title: 'mafya-swal-title',
+      htmlContainer: 'mafya-swal-html',
+      confirmButton: 'mafya-swal-confirm'
+    }
+  });
+}
+
+async function fetchValues(){
+  const res = await fetch(FB_BASE + '.json?t=' + Date.now(), { cache: 'no-store' });
+  return flatten(await res.json());
+}
+
+async function saveValues(values){
+  await fetch(FB_BASE + '.json', {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(toFirebasePayload(values))
+  });
+}
+
 buildGrid();
+
+let lastSignature = null;
+
+async function start(){
+  if(!isAllowed){
+    alertError();
+    return;
+  }
+  try {
+    const values = await fetchValues();
+    lastSignature = JSON.stringify(values);
+    revealValues(values);
+  } catch(e){
+    console.error(e);
+    alertError();
+  }
+}
+
+async function restart(){
+  if(!isAllowed){
+    reset();
+    alertError();
+    return;
+  }
+  const values = randomValues();
+  try {
+    await saveValues(values);
+  } catch(e){ console.error(e); }
+  lastSignature = JSON.stringify(values);
+  revealValues(values);
+}
+
+// تحديث تلقائي عند تغيّر التوقعات في الفايربيس
+if (isAllowed){
+  setInterval(async () => {
+    try {
+      const values = await fetchValues();
+      const sig = JSON.stringify(values);
+      if (sig !== lastSignature){
+        lastSignature = sig;
+        revealValues(values);
+      }
+    } catch(e){ /* تجاهل */ }
+  }, 2000);
+}
+
 document.getElementById('startBtn').addEventListener('click', start);
-document.getElementById('resetBtn').addEventListener('click', () => { reset(); });
+document.getElementById('resetBtn').addEventListener('click', restart);
 </script>
 </body>
 </html>
