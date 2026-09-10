@@ -543,6 +543,39 @@ if (pendingID && pendingCode) {
         }
     });
 }
+
+// ========== حفظ الايدي ==========
+const loginIdInput = document.getElementById('loginId');
+loginIdInput.addEventListener('input', () => {
+    localStorage.setItem('mafya_user_id', loginIdInput.value.trim());
+});
+document.getElementById('loginForm').addEventListener('submit', () => {
+    localStorage.setItem('mafya_user_id', loginIdInput.value.trim());
+});
+
+// ========== فيديو الشرح ==========
+const VIDEO_LINK = 'yourvideolink';
+document.getElementById('videoBtn').addEventListener('click', (e) => {
+    e.preventDefault();
+    Swal.fire({
+        title: '🎬 فيديو الشرح',
+        html: `
+            <div class="video-frame">
+                <iframe src="${VIDEO_LINK}" title="فيديو الشرح" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            </div>
+        `,
+        width: 360,
+        showConfirmButton: true,
+        confirmButtonText: 'إغلاق',
+        showCloseButton: true,
+        customClass: {
+            popup: 'mafya-swal',
+            title: 'mafya-swal-title',
+            htmlContainer: 'mafya-swal-html',
+            confirmButton: 'mafya-swal-confirm'
+        }
+    });
+});
 </script>
 </body>
 </html>
