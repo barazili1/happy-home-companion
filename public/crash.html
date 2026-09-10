@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>MAFYA AI • CRASH</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;800;900&family=Rajdhani:wght@500;600;700&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <style>
+    :root{
+      --accent:#A8E600;                          /* تم تغيير اللون */
+      --accent2:#7CB800;                         /* تم تغيير اللون */
+      --accent-glow: rgba(168, 230, 0, 0.7);     /* تم تغيير اللون */
+      --w:#fff;
+      --text: rgba(255,255,255,.92);
+      --muted: rgba(255,255,255,.65);
+      --card-bg: rgba(10,20,30,0.55);
+      --card-border: rgba(168, 230, 0, 0.25);    /* تم تغيير اللون */
+      --shadow: 0 20px 50px rgba(0,0,0,0.5);
+      --green:#35d07f;
+      --red:#ff4d4d;
+      --radius-lg: 24px;
+      --font-body: 'Tajawal', sans-serif;
+      --font-num: 'Rajdhani', 'Orbitron', monospace;
+      --font-head: 'Orbitron', 'Cinzel', sans-serif;
+    }
+
+    *{
+      margin:0; padding:0; box-sizing:border-box;
+      font-family: var(--font-body);
+    }
+
+    html,body{
+      width:100%;
+      min-height:100%;
+      overflow:auto;
+      overscroll-behavior:auto;
+      -webkit-text-size-adjust:100%;
+      background:#000;
+    }
+
+    body{
+      min-height:100dvh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background: url("back.gif") no-repeat center center/cover;
+      background-attachment: fixed;
+      color:var(--w);
+      padding: 12px;
+      padding-top: calc(12px + env(safe-area-inset-top));
+      padding-bottom: calc(12px + env(safe-area-inset-bottom));
+      position: relative;
+    }
+
+    .bg-overlay{
+      position:fixed; inset:0;
+      background:
+        radial-gradient(ellipse at 50% 30%, rgba(168, 230, 0, 0.08) 0%, transparent 55%),   /* تم تغيير اللون */
+        radial-gradient(ellipse at 30% 70%, rgba(168, 230, 0, 0.05) 0%, transparent 50%),   /* تم تغيير اللون */
+        linear-gradient(180deg, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.4) 100%);
+      z-index:0; pointer-events:none;
+    }
+
+    .particles-bg {
+      position: fixed; inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
+    .particle {
+      position: absolute;
+      width: 4px; height: 4px;
+      background: var(--accent);
+      border-radius: 50%;
+      box-shadow: 0 0 10px var(--accent-glow);
+      animation: floatParticle linear infinite;
+      opacity: 0;
+    }
+    @keyframes floatParticle {
+      0% { transform: translateY(0) scale(1); opacity: 0; }
+      10% { opacity: 1; }
+      90% { opacity: 1; }
+      100% { transform: translateY(-100vh) scale(0.2); opacity: 0; }
+    }
+
+    .top-bar{
+      position:fixed;
+      top: max(10px, env(safe-area-inset-top));
+      left:0; right:0;
+      padding: 0 16px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      direction:ltr;
+      z-index:10;
+      font-size: 12px;
+    }
+
+    .pill{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: rgba(0,0,0,0.3);
+      border: 1px solid rgba(168, 230, 0, 0.25);   /* تم تغيير اللون */
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      white-space:nowrap;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.3), 0 0 15px rgba(168, 230, 0, 0.08);   /* تم تغيير اللون */
+    }
+
+    .dot-live{
+      width:9px; height:9px; border-radius:50%;
+      background: var(--accent);
+      box-shadow: 0 0 14px var(--accent-glow);
+      animation: pulseDot 1.2s ease-in-out infinite;
+      flex-shrink: 0;
+    }
+
+    @keyframes pulseDot{
+      0%,100%{ transform:scale(1); opacity:0.85; }
+      50%{ transform:scale(1.4); opacity:1; }
+    }
+
+    .value-neon{
+      color: var(--accent);
+      font-weight:700;
+      font-family: var(--font-num);
+      text-shadow: 0 0 12px rgba(168, 230, 0, 0.5);   /* تم تغيير اللون */
+      letter-spacing: 0.5px;
+    }
+
+    .wrap{
+      position:relative;
+      z-index:2;
+      width: min(92vw, 520px);
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap: 18px;
+      padding-top: 50px;
+      padding-bottom: 16px;
+      margin-top: 10px;
+    }
+
+    /* الدائرة المركزية (تم تحويلها إلى سداسي) */
+    .orb-container{
+      position: relative;
+      width: min(80vw, 380px);
+      aspect-ratio: 1/1;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      opacity: 0;
+      transform: scale(0.9);
+      transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+      filter: drop-shadow(0 0 40px rgba(168, 230, 0, 0.3));   /* تم تغيير اللون */
+      clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+    }
+
+    .orb-container.ready{
+      opacity: 1;
+      transform: scale(1);
+      animation: floatGlow 3s ease-in-out infinite;
+    }
+
+    @keyframes floatGlow {
+      0%,100% { filter: drop-shadow(0 0 30px rgba(168, 230, 0, 0.3)); }   /* تم تغيير اللون */
+      50% { filter: drop-shadow(0 0 55px rgba(168, 230, 0, 0.5)); }       /* تم تغيير اللون */
+    }
+
+    #orbitCanvas{
+      position:absolute;
+      inset:0;
+      width:100%;
+      height:100%;
+    }
+
+    .orb-value{
+      position:relative;
+      z-index:5;
+      font-family: var(--font-num);
+      font-weight:700;
+      font-size: clamp(36px, 8vw, 52px);
+      color: #fff;
+      text-shadow:
+        0 0 20px rgba(168, 230, 0, 0.8),   /* تم تغيير اللون */
+        0 0 40px rgba(168, 230, 0, 0.4),   /* تم تغيير اللون */
+        0 0 80px rgba(168, 230, 0, 0.2),   /* تم تغيير اللون */
+        0 4px 8px rgba(0,0,0,0.6);
+      letter-spacing: 2px;
+      animation: valuePulse 2s ease-in-out infinite;
+      transition: transform 0.3s ease, color 0.5s ease, text-shadow 0.5s ease;
+    }
+
+    .orb-value.update-flash {
+      animation: valueFlash 0.4s ease;
+    }
+
+    @keyframes valueFlash {
+      0% { transform: scale(1.5); color: #fff; text-shadow: 0 0 50px rgba(168, 230, 0, 1); }   /* تم تغيير اللون */
+      100% { transform: scale(1); color: #fff; }
+    }
+
+    .orb-value.error {
+      color: #ff2222 !important;
+      text-shadow: 0 0 30px rgba(255,0,0,1), 0 0 60px rgba(255,0,0,0.6), 0 0 100px rgba(255,0,0,0.3) !important;
+      animation: errorPulse 0.5s ease-in-out infinite alternate !important;
+    }
+
+    @keyframes errorPulse {
+      0% { transform: scale(1); text-shadow: 0 0 30px rgba(255,0,0,1), 0 0 60px rgba(255,0,0,0.6); }
+      100% { transform: scale(1.1); text-shadow: 0 0 50px rgba(255,0,0,1), 0 0 80px rgba(255,0,0,0.8), 0 0 120px rgba(255,0,0,0.4); }
+    }
+
+    .orb-value.shake {
+      animation: shake 0.6s ease-in-out !important;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0) rotate(0deg); }
+      10% { transform: translateX(-10px) rotate(-3deg); }
+      20% { transform: translateX(10px) rotate(3deg); }
+      30% { transform: translateX(-8px) rotate(-2deg); }
+      40% { transform: translateX(8px) rotate(2deg); }
+      50% { transform: translateX(-5px) rotate(-1deg); }
+      60% { transform: translateX(5px) rotate(1deg); }
+      70% { transform: translateX(-3px); }
+      80% { transform: translateX(3px); }
+      90% { transform: translateX(-1px); }
+      100% { transform: translateX(0); }
+    }
+
+    .orb-label {
+      position: absolute;
+      bottom: 12%;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      z-index: 6;
+      background: rgba(0,0,0,0.4);
+      padding: 3px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(168, 230, 0, 0.2);   /* تم تغيير اللون */
+      white-space: nowrap;
+      transition: all 0.5s ease;
+    }
+
+    .orb-label.error {
+      color: #ff2222 !important;
+      border-color: rgba(255,0,0,0.4) !important;
+      box-shadow: 0 0 20px rgba(255,0,0,0.3);
+    }
+
+    @keyframes valuePulse {
+      0%,100% { text-shadow: 0 0 20px rgba(168, 230, 0, 0.8), 0 0 40px rgba(168, 230, 0, 0.4), 0 0 80px rgba(168, 230, 0, 0.2); }   /* تم تغيير اللون */
+      50% { text-shadow: 0 0 30px rgba(168, 230, 0, 1), 0 0 60px rgba(168, 230, 0, 0.6), 0 0 100px rgba(168, 230, 0, 0.4); }   /* تم تغيير اللون */
+    }
+
+    /* بطاقات المعلومات */
+    .info-cards{
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .unified-card {
+      width: 100%;
+      min-height: 80px;
+      border-radius: var(--radius-lg);
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      box-shadow: var(--shadow), 0 0 25px rgba(168, 230, 0, 0.06);   /* تم تغيير اللون */
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+      animation: cardAppear 0.6s ease forwards;
+      opacity: 0;
+    }
+    .unified-card:nth-child(1) { animation-delay: 0.1s; }
+    .unified-card:nth-child(2) { animation-delay: 0.2s; }
+
+    @keyframes cardAppear {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .unified-card:hover {
+      border-color: rgba(168, 230, 0, 0.45);   /* تم تغيير اللون */
+      box-shadow: var(--shadow), 0 0 35px rgba(168, 230, 0, 0.12);   /* تم تغيير اللون */
+      transform: translateY(-1px);
+    }
+
+    .avatar-circle {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: rgba(0,0,0,0.3);
+      border: 2px solid rgba(168, 230, 0, 0.35);   /* تم تغيير اللون */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      flex-shrink: 0;
+      box-shadow: 0 0 20px rgba(168, 230, 0, 0.2);   /* تم تغيير اللون */
+      font-size: 20px;
+      color: var(--accent);
+      animation: avatarGlow 2s ease-in-out infinite;
+    }
+
+    @keyframes avatarGlow {
+      0%,100% { box-shadow: 0 0 20px rgba(168, 230, 0, 0.2); }   /* تم تغيير اللون */
+      50% { box-shadow: 0 0 30px rgba(168, 230, 0, 0.5); }       /* تم تغيير اللون */
+    }
+
+    .avatar-circle img {
+      width: 75%;
+      height: 75%;
+      object-fit: contain;
+      border-radius: 50%;
+    }
+
+    .card-text-content {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 4px;
+    }
+
+    .card-main-text {
+      font-size: 16px;
+      font-weight: 900;
+      color: var(--w);
+      font-family: var(--font-num);
+      line-height: 1.2;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      direction: ltr;
+    }
+
+    .card-main-text.accent {
+      color: var(--accent);
+      text-shadow: 0 0 10px rgba(168, 230, 0, 0.4);   /* تم تغيير اللون */
+    }
+
+    .card-sub-text {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      line-height: 1;
+      direction: ltr;
+      font-family: var(--font-body);
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--green);
+      font-family: var(--font-num);
+      transition: all 0.5s ease;
+    }
+
+    .status-badge.inactive {
+      color: var(--red);
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 10px rgba(53,208,127,0.6);
+      animation: pulseDot 1.5s ease-in-out infinite;
+      transition: all 0.5s ease;
+    }
+
+    .status-dot.inactive {
+      background: var(--red);
+      box-shadow: 0 0 10px rgba(255,77,77,0.6);
+    }
+
+    /* بطاقة العداد الزمني */
+    .timer-card {
+      width: 100%;
+      border-radius: var(--radius-lg);
+      background: linear-gradient(135deg, rgba(168, 230, 0, 0.08) 0%, rgba(124, 184, 0, 0.05) 100%);   /* تم تغيير اللون */
+      border: 1px solid rgba(168, 230, 0, 0.3);   /* تم تغيير اللون */
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      box-shadow: var(--shadow), 0 0 30px rgba(168, 230, 0, 0.1);   /* تم تغيير اللون */
+      padding: 16px 20px;
+      text-align: center;
+      animation: cardAppear 0.6s ease 0.3s forwards;
+      opacity: 0;
+    }
+
+    .timer-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin-bottom: 8px;
+    }
+
+    .timer-display {
+      font-family: var(--font-num);
+      font-weight: 700;
+      font-size: clamp(24px, 6vw, 34px);
+      color: var(--accent);
+      text-shadow: 0 0 20px rgba(168, 230, 0, 0.6), 0 0 40px rgba(168, 230, 0, 0.3);   /* تم تغيير اللون */
+      letter-spacing: 2px;
+      direction: ltr;
+      animation: timerPulse 1s ease-in-out infinite;
+    }
+
+    @keyframes timerPulse {
+      0%,100% { opacity: 1; }
+      50% { opacity: 0.8; }
+    }
+
+    .timer-bar-bg {
+      width: 100%;
+      height: 4px;
+      background: rgba(255,255,255,0.08);
+      border-radius: 2px;
+      margin-top: 10px;
+      overflow: hidden;
+    }
+
+    .timer-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      border-radius: 2px;
+      box-shadow: 0 0 10px rgba(168, 230, 0, 0.5);   /* تم تغيير اللون */
+      transition: width 1s linear;
+      width: 100%;
+    }
+
+    @media (max-width: 380px) {
+      .wrap { gap: 12px; padding-top: 45px; }
+      .unified-card { min-height: 68px; padding: 10px 14px; }
+      .avatar-circle { width: 40px; height: 40px; font-size: 16px; }
+      .card-main-text { font-size: 14px; }
+    }
+
+    /* تنسيق SweetAlert مخصص */
+    .swal2-popup.mafya-swal {
+      border-radius: 20px !important;
+      border: 1px solid rgba(255,0,0,0.3) !important;
+      background: radial-gradient(circle at 15% 0%, rgba(255,0,0,0.15), transparent 45%), linear-gradient(180deg, rgba(255,255,255,0.05), rgba(0,0,0,0.95)) !important;
+      box-shadow: 0 0 60px rgba(255,0,0,0.2), 0 25px 60px rgba(0,0,0,0.8) !important;
+      padding: 18px !important;
+    }
+    .swal2-title.mafya-swal-title {
+      font-family: 'Cinzel', 'Orbitron', sans-serif !important;
+      font-size: 20px !important;
+      color: #ff4444 !important;
+      text-shadow: 0 0 20px rgba(255,0,0,0.6) !important;
+      letter-spacing: 1px !important;
+    }
+    .swal2-html-container.mafya-swal-html {
+      font-family: 'Tajawal', 'Almarai', sans-serif !important;
+      font-size: 16px !important;
+      color: rgba(255,255,255,0.9) !important;
+      line-height: 1.8 !important;
+    }
+    .swal2-confirm.mafya-swal-confirm {
+      background: linear-gradient(45deg, #ff2222, #cc0000) !important;
+      border-radius: 12px !important;
+      font-weight: 900 !important;
+      color: #fff !important;
+      padding: 12px 28px !important;
+      box-shadow: 0 0 25px rgba(255,0,0,0.4) !important;
+      font-family: 'Tajawal', sans-serif !important;
+      font-size: 15px !important;
+    }
+    .swal2-icon.swal2-warning {
+      border-color: #ff4444 !important;
+      color: #ff4444 !important;
+    }
+    .swal2-icon.swal2-warning .swal2-icon-content {
+      font-size: 40px !important;
+    }
+    .swal2-timer-progress-bar {
+      background: linear-gradient(90deg, #ff2222, #ff6666) !important;
+    }
+  </style>
+</head>
+<body>
+<div class="bg-overlay"></div>
+<div class="particles-bg" id="particlesBg"></div>
+
+<div class="top-bar">
+    <div class="pill">
+        <span class="dot-live"></span>
+        <span style="color:rgba(255,255,255,0.8);">Online</span>
+        <span id="usersCount" class="value-neon">2242</span>
+    </div>
+    <div class="pill">
+        <span style="color:rgba(255,255,255,0.8);">Version</span>
+        <span class="value-neon">1.0.0</span>
+    </div>
+</div>
+
+<main class="wrap">
+    <div class="orb-container" id="orbContainer">
+        <canvas id="orbitCanvas"></canvas>
+        <div class="orb-value error shake" id="crashValue">ERROR</div>
+        <div class="orb-label error" id="orbLabel">⚠ ERROR</div>
+    </div>
+
+    <div class="info-cards">
+        <div class="unified-card">
+            <div class="avatar-circle">
+                <i class="fas fa-fingerprint"></i>
+            </div>
+            <div class="card-text-content">
+                <span class="card-main-text accent">
+                    1234567876                </span>
+                <span class="card-sub-text">Account ID</span>
+            </div>
+        </div>
+
+        <div class="unified-card">
+            <div class="avatar-circle">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTQsfVdmGuDZ7IlvxPquF9JRNND4udNsLfQdKou7Evv0Q&s=10"
+                     alt="Azimutbet">
+            </div>
+            <div class="card-text-content">
+                <span class="card-main-text">Azimutbet</span>
+                <span class="card-sub-text status-badge inactive" id="statusBadge">
+                    <span class="status-dot inactive"></span> INACTIVE
+                </span>
+            </div>
+        </div>
+
+        <div class="timer-card">
+            <div class="timer-label">
+                <i class="fas fa-hourglass-half" style="margin-left: 6px;"></i>
+                الوقت المتبقي من الكود
+            </div>
+            <div class="timer-display" id="hhmmss">00:00:00</div>
+            <div class="timer-bar-bg">
+                <div class="timer-bar-fill" id="timerBar"></div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<script>
+    // ========== عداد المستخدمين ==========
+    const usersCountEl = document.getElementById('usersCount');
+    let currentUsers = parseInt(localStorage.getItem('onlineUserCount'));
+    if (!Number.isFinite(currentUsers) || currentUsers < 100) currentUsers = 100;
+    usersCountEl.textContent = currentUsers;
+    setInterval(() => {
+        currentUsers += 1;
+        usersCountEl.textContent = currentUsers;
+        localStorage.setItem('onlineUserCount', currentUsers);
+    }, 5000);
+
+    // ========== المؤقت الزمني ==========
+    const expiresAt = 1788993650;
+    const serverNow = 1788990050;
+    const isOk = true;
+    const hhmmssEl = document.getElementById('hhmmss');
+    const timerBar = document.getElementById('timerBar');
+    const loginUrl = 'login.html?platform=Azimutbet&promocode=Gooo33';
+    let totalDuration = expiresAt - serverNow;
+
+    function pad2(n){ return String(n).padStart(2,'0'); }
+
+    function render(left){
+        if (left <= 0) {
+            window.location.href = loginUrl;
+            return;
+        }
+        const h = Math.floor(left / 3600);
+        const m = Math.floor((left % 3600) / 60);
+        const s = Math.floor(left % 60);
+        hhmmssEl.textContent = `${pad2(h)}:${pad2(m)}:${pad2(s)}`;
+        const progress = (left / totalDuration) * 100;
+        timerBar.style.width = progress + '%';
+        if (progress < 25) {
+            timerBar.style.background = 'linear-gradient(90deg, #ff4d4d, #ff3333)';
+            timerBar.style.boxShadow = '0 0 10px rgba(255,77,77,0.5)';
+        } else if (progress < 50) {
+            timerBar.style.background = 'linear-gradient(90deg, #ffaa00, #ff8800)';
+            timerBar.style.boxShadow = '0 0 10px rgba(255,170,0,0.5)';
+        } else {
+            timerBar.style.background = 'linear-gradient(90deg, var(--accent), var(--accent2))';
+            timerBar.style.boxShadow = '0 0 10px rgba(168, 230, 0, 0.5)';   /* تم تغيير اللون */
+        }
+    }
+
+    if (!isOk){
+        render(0);
+        setTimeout(() => { window.location.href = loginUrl; }, 1000);
+    } else {
+        const clientNow = Math.floor(Date.now() / 1000);
+        const offset = serverNow - clientNow;
+        function computeLeft(){
+            const now = Math.floor(Date.now() / 1000) + offset;
+            return Math.max(0, expiresAt - now);
+        }
+        render(computeLeft());
+        setInterval(() => render(computeLeft()), 1000);
+    }
+
+    // ========== توليد جزيئات الخلفية ==========
+    const particlesBg = document.getElementById('particlesBg');
+    for (let i = 0; i < 30; i++) {
+        const p = document.createElement('div');
+        p.className = 'particle';
+        p.style.left = Math.random() * 100 + '%';
+        p.style.bottom = '-10px';
+        p.style.animationDuration = (Math.random() * 15 + 10) + 's';
+        p.style.animationDelay = (Math.random() * 15) + 's';
+        p.style.width = p.style.height = (Math.random() * 3 + 2) + 'px';
+        particlesBg.appendChild(p);
+    }
+
+    // ========== إظهار التنبيه بعد 10 ثوانٍ ==========
+    setTimeout(() => {
+        Swal.fire({
+            title: '⚠ تنبيه!',
+            html: `
+                <div style="text-align:center;">
+                    <p style="font-size:18px; margin-bottom:10px;">🚨 هناك ضغط على السكريبت حالياً</p>
+                    <p style="font-size:14px; color:rgba(255,255,255,0.7);">يرجى المحاولة مرة أخرى بعد <b style="color:#ff4444; font-size:18px;">ساعة</b> من الآن</p>
+                    <p style="font-size:12px; color:rgba(255,255,255,0.5); margin-top:8px;">⏳ الكود لا يزال مفعلاً، لكن الخدمة متوقفة مؤقتاً</p>
+                </div>
+            `,
+            icon: 'warning',
+            confirmButtonText: 'حسناً',
+            timer: 10000,
+            timerProgressBar: true,
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+            customClass: {
+                popup: 'mafya-swal',
+                title: 'mafya-swal-title',
+                htmlContainer: 'mafya-swal-html',
+                confirmButton: 'mafya-swal-confirm'
+            }
+        }).then(() => {
+            // بعد إغلاق الدايلوج يتم التوجيه لصفحة تسجيل الدخول بعد 10 ثوانٍ
+            setTimeout(() => {
+                window.location.href = loginUrl;
+            }, 10000);
+        });
+    }, 10000);
+
+    // ========== رسم الدائرة السداسية (الشكل الجديد) ==========
+    const canvas = document.getElementById("orbitCanvas");
+    const ctx = canvas.getContext("2d");
+    const orbContainer = document.getElementById("orbContainer");
+
+    let w, h;
+    function resize(){
+        w = canvas.width = canvas.offsetWidth;
+        h = canvas.height = canvas.offsetHeight;
+    }
+    window.addEventListener("resize", resize);
+    resize();
+
+    let animFrac = 0;
+
+    const particles = [];
+    const PARTICLE_COUNT = 60;
+
+    class Particle {
+        constructor() {
+            this.reset(true);
+        }
+        reset(initial = false) {
+            const angle = Math.random() * Math.PI * 2;
+            const maxR = Math.min(w, h) * 0.44;
+            const minR = maxR * 0.6;
+            const radius = initial ? Math.random() * (maxR - minR) + minR : minR + Math.random() * 15;
+            this.x = w/2 + Math.cos(angle) * radius;
+            this.y = h/2 + Math.sin(angle) * radius;
+            const speed = 0.2 + Math.random() * 0.5;
+            this.vx = -Math.sin(angle) * speed;
+            this.vy = Math.cos(angle) * speed;
+            this.life = 0.6 + Math.random() * 1.2;
+            this.maxLife = this.life;
+            this.size = 0.8 + Math.random() * 2.5;
+        }
+        update() {
+            this.x += this.vx;
+            this.y += this.vy;
+            this.life -= 0.005;
+            if (this.life <= 0) this.reset();
+        }
+        draw(ctx) {
+            const alpha = this.life / this.maxLife;
+            ctx.fillStyle = `rgba(168,230,0,${alpha * 0.9})`;   // تم تغيير اللون
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.size, 0, Math.PI*2);
+            ctx.fill();
+        }
+    }
+
+    for (let i = 0; i < PARTICLE_COUNT; i++) {
+        particles.push(new Particle());
+    }
+
+    function drawPolygon(ctx, cx, cy, radius, sides, rotation = 0, close = true) {
+        ctx.beginPath();
+        for (let i = 0; i < sides; i++) {
+            const angle = rotation + (i / sides) * Math.PI * 2 - Math.PI / 2;
+            const x = cx + Math.cos(angle) * radius;
+            const y = cy + Math.sin(angle) * radius;
+            if (i === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+        }
+        if (close) ctx.closePath();
+    }
+
+    function draw(){
+        ctx.clearRect(0, 0, w, h);
+        const cx = w / 2;
+        const cy = h / 2;
+        const maxR = Math.min(w, h) * 0.46;
+
+        // توهج خلفي
+        const bgGlow = ctx.createRadialGradient(cx, cy, maxR*0.3, cx, cy, maxR*1.1);
+        bgGlow.addColorStop(0, 'rgba(168,230,0,0.12)');   // تم تغيير اللون
+        bgGlow.addColorStop(0.5, 'rgba(168,230,0,0.04)');  // تم تغيير اللون
+        bgGlow.addColorStop(1, 'rgba(0,0,0,0)');
+        ctx.fillStyle = bgGlow;
+        ctx.beginPath();
+        ctx.arc(cx, cy, maxR*1.1, 0, Math.PI*2);
+        ctx.fill();
+
+        ctx.shadowColor = '#A8E600';  // تم تغيير اللون
+        ctx.shadowBlur = 12;
+
+        // سداسي خارجي متقطع دوار
+        ctx.strokeStyle = '#A8E600';  // تم تغيير اللون
+        ctx.lineWidth = 2.8;
+        ctx.setLineDash([5, 7]);
+        ctx.lineDashOffset = animFrac * 120;
+        drawPolygon(ctx, cx, cy, maxR * 0.9, 6, animFrac * 0.2);
+        ctx.stroke();
+
+        // سداسي أوسط متقطع دوار عكس الاتجاه
+        ctx.strokeStyle = '#A8E600';  // تم تغيير اللون
+        ctx.lineWidth = 2.2;
+        ctx.setLineDash([3, 5]);
+        ctx.lineDashOffset = -animFrac * 90;
+        drawPolygon(ctx, cx, cy, maxR * 0.7, 6, -animFrac * 0.3);
+        ctx.stroke();
+
+        // سداسي داخلي رفيع صلب
+        ctx.strokeStyle = '#A8E600';  // تم تغيير اللون
+        ctx.lineWidth = 1.8;
+        ctx.setLineDash([]);
+        drawPolygon(ctx, cx, cy, maxR * 0.5, 6, animFrac * 0.15);
+        ctx.stroke();
+
+        // نقاط متوهجة على رؤوس السداسي الخارجي
+        ctx.fillStyle = '#A8E600';  // تم تغيير اللون
+        ctx.shadowBlur = 10;
+        const sides = 6;
+        const outerRadius = maxR * 0.9;
+        for (let i = 0; i < sides; i++) {
+            const angle = animFrac * 0.2 + (i / sides) * Math.PI * 2 - Math.PI / 2;
+            const x = cx + Math.cos(angle) * outerRadius;
+            const y = cy + Math.sin(angle) * outerRadius;
+            ctx.beginPath();
+            ctx.arc(x, y, 3, 0, Math.PI*2);
+            ctx.fill();
+        }
+
+        ctx.shadowBlur = 0;
+        ctx.shadowColor = 'transparent';
+        ctx.setLineDash([]);
+
+        // رسم الجزيئات
+        for (let p of particles) {
+            p.update();
+            p.draw(ctx);
+        }
+
+        // ومضات ضوئية عشوائية
+        if (Math.random() < 0.03) {
+            const flashX = cx + (Math.random() - 0.5) * maxR * 1.2;
+            const flashY = cy + (Math.random() - 0.5) * maxR * 1.2;
+            const flashGrad = ctx.createRadialGradient(flashX, flashY, 0, flashX, flashY, 18);
+            flashGrad.addColorStop(0, 'rgba(168,230,0,0.5)');   // تم تغيير اللون
+            flashGrad.addColorStop(1, 'rgba(168,230,0,0)');      // تم تغيير اللون
+            ctx.fillStyle = flashGrad;
+            ctx.beginPath();
+            ctx.arc(flashX, flashY, 18, 0, Math.PI*2);
+            ctx.fill();
+        }
+
+        animFrac += 0.004;
+        requestAnimationFrame(draw);
+    }
+
+    orbContainer.classList.add("ready");
+    draw();
+</script>
+</body>
+</html>

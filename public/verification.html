@@ -1,0 +1,983 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>MAFYA - التحقق</title>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Almarai:wght@400;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <style>
+    :root{
+      --primary: #050B2E;
+      --accent:#A8E600;                          /* تم تغيير اللون */
+      --accent2:#7CB800;                         /* تم تغيير اللون */
+      --w:#fff;
+      --text: rgba(255,255,255,.92);
+      --muted: rgba(255,255,255,.72);
+      --overlayA: rgba(5,11,46,.20);
+      --overlayB: rgba(5,11,46,.65);
+      --card: rgba(5,11,46,.55);
+      --border: rgba(168, 230, 0, .25);          /* تم تغيير اللون */
+      --shadow: rgba(0,0,0,.50);
+      --ok:#35d07f;
+      --bad:#ff4d4d;
+      --r: 16px;
+      --safeTop: env(safe-area-inset-top);
+      --safeBot: env(safe-area-inset-bottom);
+      --topBarSpace: 58px;
+    }
+
+    *{
+      margin:0;
+      padding:0;
+      box-sizing:border-box;
+      font-family:'Almarai', system-ui, -apple-system, Segoe UI, Roboto, Tahoma, Arial;
+    }
+
+    html, body{
+      width:100%;
+      min-height:100%;
+      overflow-x:hidden;
+      overflow-y:auto;
+      background: var(--primary);
+      -webkit-text-size-adjust:100%;
+    }
+
+    body{
+      position:relative;
+      min-height:100dvh;
+      background: var(--primary) url("back.gif") no-repeat center center/cover;
+      background-attachment: fixed;
+      color:var(--w);
+      padding-bottom: calc(10px + var(--safeBot));
+    }
+
+    .overlay{
+      position:fixed;
+      inset:0;
+      background:
+        radial-gradient(900px 520px at 50% 30%, rgba(168, 230, 0, .12), transparent 62%),   /* تم تغيير اللون */
+        linear-gradient(180deg, var(--overlayA), var(--overlayB));
+      backdrop-filter: blur(1px);
+      z-index:0;
+      pointer-events:none;
+    }
+
+    .grid-bg {
+      position:fixed;
+      inset:0;
+      background-image:
+        linear-gradient(rgba(168, 230, 0, 0.04) 1px, transparent 1px),   /* تم تغيير اللون */
+        linear-gradient(90deg, rgba(168, 230, 0, 0.04) 1px, transparent 1px);  /* تم تغيير اللون */
+      background-size:40px 40px;
+      animation: gridMove 20s linear infinite;
+      z-index:0;
+      pointer-events:none;
+    }
+    @keyframes gridMove {
+      0% { background-position:0 0,0 0; }
+      100% { background-position:40px 40px,40px 40px; }
+    }
+
+    .screen{
+      position:relative;
+      z-index:2;
+      width:100%;
+      min-height:100dvh;
+      display:flex;
+      align-items:flex-start;
+      justify-content:center;
+      padding:10px;
+      padding-top:calc(var(--topBarSpace) + var(--safeTop));
+    }
+
+    .top-bar{
+      position:fixed;
+      top:max(8px, var(--safeTop));
+      left:0;
+      right:0;
+      z-index:10;
+      padding:0 10px;
+      display:flex;
+      justify-content:space-between;
+      gap:8px;
+      direction:ltr;
+      font-size:11.5px;
+    }
+
+    .pill{
+      display:flex;
+      align-items:center;
+      gap:7px;
+      padding:7px 10px;
+      border-radius:999px;
+      background:rgba(5,11,46,.55);
+      border:1px solid rgba(168, 230, 0, .25);   /* تم تغيير اللون */
+      backdrop-filter:blur(8px);
+      white-space:nowrap;
+    }
+
+    .dot{
+      width:8px;
+      height:8px;
+      border-radius:50%;
+      background:var(--accent);
+      box-shadow:0 0 10px rgba(168, 230, 0, .65);  /* تم تغيير اللون */
+      animation:pulse 1.2s ease-in-out infinite;
+    }
+
+    @keyframes pulse{
+      0%,100%{transform:scale(1);opacity:.85}
+      50%{transform:scale(1.25);opacity:1}
+    }
+
+    .value{
+      color:var(--accent);
+      font-weight:900;
+      min-width:34px;
+      text-align:right;
+      direction:ltr;
+    }
+
+    .card{
+      width:min(92vw, 520px);
+      border-radius:20px;
+      border:1px solid rgba(168, 230, 0, .35);   /* تم تغيير اللون */
+      background:var(--card);
+      backdrop-filter:blur(16px);
+      -webkit-backdrop-filter:blur(16px);
+      box-shadow:0 16px 45px var(--shadow), 0 0 30px rgba(168, 230, 0, .08);  /* تم تغيير اللون */
+      padding:16px;
+      overflow:visible;
+    }
+
+    .brand{
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:8px;
+      margin-bottom:10px;
+    }
+
+    .logo{
+      width:110px;
+      max-width:38vw;
+      filter:drop-shadow(0 0 16px rgba(168, 230, 0, .35));  /* تم تغيير اللون */
+      animation:float 3s ease-in-out infinite;
+    }
+
+    @keyframes float{
+      0%,100%{transform:translateY(0)}
+      50%{transform:translateY(-6px)}
+    }
+
+    .title{
+      font-weight:900;
+      letter-spacing:.3px;
+      font-size:15px;
+      color:var(--text);
+      text-align:center;
+    }
+
+    .workon{
+      margin-top:8px;
+      border-radius:var(--r);
+      background:rgba(5,11,46,.45);
+      border:1px solid rgba(168, 230, 0, .25);   /* تم تغيير اللون */
+      padding:10px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      direction:ltr;
+    }
+
+    .wo-left{
+      display:flex;
+      align-items:center;
+      gap:9px;
+      min-width:0;
+      flex:1;
+      flex-wrap:wrap;
+      justify-content:center;
+    }
+
+    .plat-mini{
+      width:24px;
+      height:24px;
+      border-radius:8px;
+      object-fit:contain;
+      background:rgba(255,255,255,.06);
+      border:1px solid rgba(168, 230, 0, .25);   /* تم تغيير اللون */
+      padding:2px;
+      flex:0 0 auto;
+    }
+
+    .note{
+      margin-top:9px;
+      color:var(--muted);
+      font-size:12px;
+      line-height:1.7;
+      text-align:center;
+    }
+
+    .steps{
+      margin-top:9px;
+      border-radius:var(--r);
+      background:rgba(5,11,46,.45);
+      border:1px solid rgba(168, 230, 0, .25);   /* تم تغيير اللون */
+      padding:11px;
+    }
+
+    .steps ol{
+      margin:0;
+      padding-right:18px;
+      color:var(--text);
+      font-size:12.4px;
+      line-height:1.9;
+    }
+
+    .steps b, .steps .promo-highlight {
+      color: var(--accent);
+      font-weight: 900;
+      text-shadow: 0 0 8px rgba(168, 230, 0, .5);  /* تم تغيير اللون */
+    }
+
+    .field{
+      margin-top:9px;
+      display:flex;
+      align-items:center;
+      gap:10px;
+      padding:10px;
+      border-radius:var(--r);
+      background:rgba(5,11,46,.45);
+      border:1px solid rgba(168, 230, 0, .25);   /* تم تغيير اللون */
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+    .field:focus-within{
+      border-color: rgba(168, 230, 0, .60);   /* تم تغيير اللون */
+      box-shadow: 0 0 18px rgba(168, 230, 0, .18);  /* تم تغيير اللون */
+    }
+
+    .ic{
+      width:38px;
+      height:38px;
+      border-radius:14px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background:rgba(168, 230, 0, .18);   /* تم تغيير اللون */
+      border:1px solid rgba(168, 230, 0, .28);   /* تم تغيير اللون */
+      color:var(--w);
+      font-weight:900;
+      font-size:12px;
+      flex:0 0 auto;
+      user-select:none;
+      direction:ltr;
+    }
+
+    .input{
+      width:100%;
+      background:transparent;
+      border:0;
+      outline:0;
+      color:var(--w);
+      font-size:13.5px;
+      padding:6px 0;
+      direction:ltr;
+    }
+
+    .input::placeholder{
+      color:rgba(255,255,255,.55);
+    }
+
+    .uploads{
+      margin-top:9px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    @media (max-width: 380px){
+      .uploads{
+        gap: 8px;
+      }
+      .up label {
+        font-size: 11px;
+      }
+      .upload-box {
+        height: 130px;
+      }
+    }
+
+    .up{
+      border-radius:var(--r);
+      background:rgba(5,11,46,.45);
+      border:1px solid rgba(168, 230, 0, .25);   /* تم تغيير اللون */
+      padding:10px;
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+    }
+
+    .up label{
+      font-weight:900;
+      font-size:12.2px;
+      color:var(--text);
+    }
+
+    .upload-box{
+      width:100%;
+      height:140px;
+      border:2px dashed rgba(168, 230, 0, .50);   /* تم تغيير اللون */
+      border-radius:14px;
+      background:rgba(5,11,46,.45);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      color:rgba(255,255,255,.55);
+      cursor:pointer;
+      overflow:hidden;
+      position:relative;
+      transition:.15s ease;
+      user-select:none;
+    }
+
+    .upload-box:hover{
+      transform:scale(1.01);
+      box-shadow:0 0 18px rgba(168, 230, 0, .14);  /* تم تغيير اللون */
+      border-color:rgba(255,255,255,.35);
+    }
+
+    .upload-box.has-img{
+      border-style:solid;
+      border-color:rgba(168, 230, 0, .55);   /* تم تغيير اللون */
+    }
+
+    .upload-box small{
+      position:absolute;
+      bottom:8px;
+      left:8px;
+      background:rgba(5,11,46,.70);
+      border:1px solid rgba(168, 230, 0, .25);   /* تم تغيير اللون */
+      padding:4px 8px;
+      border-radius:999px;
+      font-size:11px;
+      color:var(--text);
+      direction:ltr;
+    }
+
+    .upload-gif {
+      position: absolute;
+      max-width: 70%;
+      max-height: 70%;
+      opacity: 0.35;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .upload-box.has-img .upload-gif {
+      display: none;
+    }
+
+    input[type="file"]{
+      display:none;
+    }
+
+    .btn{
+      margin-top:10px;
+      border:0;
+      cursor:pointer;
+      border-radius:var(--r);
+      padding:12px 14px;
+      font-weight:900;
+      letter-spacing:.4px;
+      width:100%;
+      font-size:13.5px;
+      transition:transform .12s ease, opacity .12s ease;
+    }
+
+    .btn:active{
+      transform:scale(.99);
+    }
+
+    .btn[disabled]{
+      opacity:.6;
+      cursor:not-allowed;
+    }
+
+    .btn-primary{
+      color:#111;
+      background:linear-gradient(90deg, var(--accent), var(--accent2));
+      box-shadow:0 16px 40px rgba(168, 230, 0, .20);  /* تم تغيير اللون */
+      border: 1px solid rgba(168, 230, 0, .5);   /* تم تغيير اللون */
+    }
+    .btn-primary:hover{
+      filter: brightness(1.05);
+      box-shadow:0 16px 45px rgba(168, 230, 0, .30);  /* تم تغيير اللون */
+    }
+
+    .loading{
+      position:fixed;
+      inset:0;
+      z-index:100;
+      display:none;
+      align-items:center;
+      justify-content:center;
+      background:rgba(5,11,46,.70);
+      backdrop-filter:blur(8px);
+      padding:16px;
+    }
+
+    .loading.show{
+      display:flex;
+    }
+
+    .loadbox{
+      width:min(92vw, 340px);
+      border-radius:16px;
+      padding:14px;
+      background:rgba(5,11,46,.85);
+      border:1px solid rgba(168, 230, 0, .30);  /* تم تغيير اللون */
+      display:flex;
+      align-items:center;
+      gap:10px;
+    }
+
+    .spinner{
+      width:20px;
+      height:20px;
+      border-radius:999px;
+      border:3px solid rgba(255,255,255,.18);
+      border-top-color:var(--accent);
+      animation:spin 1s linear infinite;
+      flex:0 0 auto;
+    }
+
+    @keyframes spin{
+      to{transform:rotate(360deg);}
+    }
+
+    .loadtxt{
+      font-weight:900;
+      font-size:12.5px;
+      color:var(--text);
+      white-space:nowrap;
+    }
+
+    .copy-promo-icon {
+      cursor: pointer;
+      margin-right: 6px;
+      font-size: 14px;
+      color: var(--accent);
+      transition: transform 0.15s ease, opacity 0.15s ease;
+    }
+    .copy-promo-icon:hover {
+      transform: scale(1.2);
+      opacity: 0.8;
+    }
+    .copy-promo-icon:active {
+      transform: scale(0.95);
+    }
+    #promoCodeValue {
+      color: var(--accent);
+      text-shadow: 0 0 8px rgba(168, 230, 0, .5);  /* تم تغيير اللون */
+      font-weight: 900;
+    }
+
+    .download-platform-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: rgba(168, 230, 0, .14);   /* تم تغيير اللون */
+      border: 1px solid rgba(168, 230, 0, .28);   /* تم تغيير اللون */
+      color: #fff;
+      font-weight: 900;
+      font-size: 12px;
+      text-decoration: none;
+      transition: transform 0.12s ease, background 0.12s ease, box-shadow 0.12s ease;
+      margin-top: 9px;
+      width: 100%;
+      justify-content: center;
+    }
+    .download-platform-btn:hover {
+      transform: translateY(-1px);
+      background: rgba(168, 230, 0, .25);  /* تم تغيير اللون */
+      box-shadow: 0 0 14px rgba(168, 230, 0, .18);  /* تم تغيير اللون */
+    }
+    .download-platform-btn i {
+      font-size: 13px;
+    }
+
+    /* تنسيق SweetAlert */
+    .swal2-popup.mafya-swal {
+      border-radius: 20px !important;
+      border: 1px solid rgba(168, 230, 0, .45) !important;   /* تم تغيير اللون */
+      background: radial-gradient(circle at 15% 0%, rgba(168, 230, 0, .18), transparent 45%), linear-gradient(180deg, rgba(5,11,46,.95), rgba(5,11,46,.98)) !important;   /* تم تغيير اللون */
+      box-shadow: 0 0 40px rgba(168, 230, 0, .2), 0 25px 60px rgba(0,0,0,.8) !important;   /* تم تغيير اللون */
+      padding: 18px !important;
+    }
+    .swal2-title.mafya-swal-title {
+      font-family: 'Cinzel', 'Orbitron', sans-serif !important;
+      font-size: 18px !important;
+      color: #fff !important;
+      text-shadow: 0 0 10px rgba(168, 230, 0, .6);  /* تم تغيير اللون */
+      letter-spacing: .5px;
+    }
+    .swal2-html-container.mafya-swal-html {
+      font-family: 'Almarai', sans-serif !important;
+      font-size: 15px !important;
+      color: rgba(255,255,255,.9) !important;
+      line-height: 1.7;
+    }
+    .swal2-confirm.mafya-swal-confirm {
+      background: linear-gradient(45deg, var(--accent), var(--accent2)) !important;
+      border-radius: 12px !important;
+      font-weight: 900 !important;
+      color: #000 !important;
+      padding: 10px 20px !important;
+      box-shadow: 0 0 15px rgba(168, 230, 0, .5) !important;   /* تم تغيير اللون */
+      font-family: 'Almarai', sans-serif;
+    }
+    .swal2-icon.swal2-error {
+      border-color: #ff4d4d !important;
+      color: #ff4d4d !important;
+    }
+    .swal2-icon.swal2-warning {
+      border-color: #ffaa00 !important;
+      color: #ffaa00 !important;
+    }
+
+    /* قائمة الألعاب */
+    .games-list{
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      margin-top:4px;
+    }
+    .game-row{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      width:100%;
+      padding:10px 12px;
+      border-radius:16px;
+      background:rgba(5,11,46,.55);
+      border:1px solid rgba(168,230,0,.28);
+      cursor:pointer;
+      transition:transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+      direction:rtl;
+    }
+    .game-row:hover{
+      transform:translateY(-2px);
+      border-color:rgba(168,230,0,.6);
+      box-shadow:0 0 18px rgba(168,230,0,.22);
+    }
+    .game-title{
+      font-family:'Almarai',sans-serif;
+      font-weight:900;
+      font-size:14.5px;
+      color:#fff;
+    }
+    .game-ic{
+      width:50px;
+      height:50px;
+      flex:0 0 50px;
+      border-radius:14px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background:rgba(168,230,0,.14);
+      border:1px solid rgba(168,230,0,.3);
+      overflow:hidden;
+      color:var(--accent);
+      font-size:22px;
+    }
+    .game-ic img{
+      width:100%;
+      height:100%;
+      object-fit:contain;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="overlay"></div>
+  <div class="grid-bg"></div>
+
+  <div class="top-bar">
+    <div class="pill">
+      <span class="dot"></span>
+      Users Online:
+      <span id="usersCount" class="value">0</span>
+    </div>
+    <div class="pill">
+      version:
+      <span class="value">1.0.0</span>
+    </div>
+  </div>
+
+  <div class="screen">
+    <main class="card" role="main">
+      <div class="brand">
+        <div class="title">التحقق وأخذ كود مجاني</div>
+      </div>
+
+      <div class="workon">
+        <div class="wo-left">
+          <span style="font-weight:900; font-size:12.5px; color:var(--text);">WORK ON</span>
+          <img id="platformLogo" class="plat-mini" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTQsfVdmGuDZ7IlvxPquF9JRNND4udNsLfQdKou7Evv0Q&s=10" alt="Azimutbet">
+          <span style="font-weight:900; font-size:12.5px; color:var(--text);">PROMOCODE : 
+            <span id="promoCodeValue">Gooo33</span>
+          </span>
+          <i class="fas fa-copy copy-promo-icon" id="copyPromoBtn" title="نسخ البروموكود"></i>
+        </div>
+      </div>
+
+      <div class="note">لن يتم إعطاء الكود إلا بعد تنفيذ الخطوات والتحقق منها ⬇️</div>
+
+      <div class="steps">
+        <ol>
+          <li>هتحمل منصة <b id="platformNameInSteps">Azimutbet</b></li>
+          <li>هتعمل حساب جديد باستخدام البروموكود (<span class="promo-highlight">Gooo33</span>)</li>
+          <li>قم بإيداع <b>10 دولار</b> في حسابك أو <b>5 دولار</b> بحد أدنى</li>
+          <li>أدخل ID الحساب وضع الأسكرينات المطلوبة</li>
+          <li>أضغط بدء التحقق لكي تأخذ الكود المجاني</li>
+        </ol>
+      </div>
+
+      <a href="https://reffpa.com/L?tag=d_4400094m_97c_&amp;site=4400094&amp;ad=97&amp;r=registration" target="_blank" rel="noopener noreferrer" class="download-platform-btn">
+        <i class="fas fa-download"></i> تحميل المنصه
+      </a>
+
+      <div class="field">
+        <div class="ic">ID</div>
+        <input class="input" id="userId" type="text" placeholder="Your ID Account ?" autocomplete="off" />
+      </div>
+
+      <div class="uploads">
+        <div class="up">
+          <label>اسكرين الإيداع</label>
+          <div class="upload-box" id="depositBox" role="button" tabindex="0">
+            <img src="IMG/UploadFiles.gif" alt="Upload" class="upload-gif">
+            <small>Deposit</small>
+          </div>
+          <input id="depositShot" type="file" accept="image/*" />
+        </div>
+
+        <div class="up">
+          <label>اسكرين البروموكود</label>
+          <div class="upload-box" id="promoBox" role="button" tabindex="0">
+            <img src="IMG/UploadFiles.gif" alt="Upload" class="upload-gif">
+            <small>Promocode</small>
+          </div>
+          <input id="promoShot" type="file" accept="image/*" />
+        </div>
+      </div>
+
+      <button class="btn btn-primary" id="verifyBtn" type="button">بدء التحقق</button>
+    </main>
+  </div>
+
+  <div class="loading" id="loading">
+    <div class="loadbox">
+      <div class="spinner"></div>
+      <div class="loadtxt" id="loadingText">جاري التحقق...</div>
+    </div>
+  </div>
+
+  <script>
+    // عداد المستخدمين
+    const usersCountEl = document.getElementById('usersCount');
+    let userCount = parseInt(localStorage.getItem('onlineUserCount'), 10);
+    if (!Number.isFinite(userCount) || userCount < 100) userCount = 100;
+    usersCountEl.textContent = userCount;
+    setInterval(() => {
+      userCount += 1;
+      usersCountEl.textContent = userCount;
+      localStorage.setItem('onlineUserCount', String(userCount));
+      localStorage.setItem('usersOnline_last', String(userCount));
+    }, 5000);
+
+    const platformName = "Azimutbet";
+    const platformLogo = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTQsfVdmGuDZ7IlvxPquF9JRNND4udNsLfQdKou7Evv0Q&s=10";
+    const platformKey = "Azimutbet";
+    const promocode = "Gooo33";
+
+    // ========== نسخ البروموكود ==========
+    document.getElementById('copyPromoBtn').addEventListener('click', function() {
+      const promoText = document.getElementById('promoCodeValue').textContent.trim();
+      if (!promoText || promoText === 'NONE') {
+        Swal.fire({
+          title: 'تنبيه',
+          text: 'لا يوجد بروموكود لنسخه',
+          icon: 'warning',
+          confirmButtonText: 'حسناً',
+          customClass: {
+            popup: 'mafya-swal',
+            title: 'mafya-swal-title',
+            htmlContainer: 'mafya-swal-html',
+            confirmButton: 'mafya-swal-confirm'
+          }
+        });
+        return;
+      }
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(promoText).then(() => {
+          Swal.fire({
+            title: 'تم النسخ!',
+            text: 'تم نسخ البروموكود: ' + promoText,
+            icon: 'success',
+            timer: 2000,
+            showConfirmButton: false,
+            customClass: {
+              popup: 'mafya-swal',
+              title: 'mafya-swal-title',
+              htmlContainer: 'mafya-swal-html'
+            }
+          });
+        }).catch(() => fallbackCopy(promoText));
+      } else {
+        fallbackCopy(promoText);
+      }
+    });
+
+    function fallbackCopy(text) {
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      textarea.style.position = 'fixed';
+      textarea.style.opacity = '0';
+      document.body.appendChild(textarea);
+      textarea.select();
+      try {
+        document.execCommand('copy');
+        Swal.fire({
+          title: 'تم النسخ!',
+          text: 'تم نسخ البروموكود: ' + text,
+          icon: 'success',
+          timer: 2000,
+          showConfirmButton: false,
+          customClass: {
+            popup: 'mafya-swal',
+            title: 'mafya-swal-title',
+            htmlContainer: 'mafya-swal-html'
+          }
+        });
+      } catch (err) {
+        Swal.fire({
+          title: 'خطأ',
+          text: 'فشل النسخ، حاول يدوياً',
+          icon: 'error',
+          confirmButtonText: 'حسناً',
+          customClass: {
+            popup: 'mafya-swal',
+            title: 'mafya-swal-title',
+            htmlContainer: 'mafya-swal-html',
+            confirmButton: 'mafya-swal-confirm'
+          }
+        });
+      }
+      document.body.removeChild(textarea);
+    }
+
+    // ========== رفع الصور ==========
+    function setupUpload(box, input, label) {
+      box.addEventListener('click', () => input.click());
+      box.addEventListener('keydown', (e) => {
+        if(e.key === 'Enter' || e.key === ' ') input.click();
+      });
+      input.addEventListener('change', (e) => setPreview(e.target.files?.[0], box, label));
+    }
+
+    function setPreview(file, box, label){
+      if (!file || !file.type.match(/^image\//)) {
+        Swal.fire({
+          title: 'خطأ',
+          text: 'ارفع صورة صحيحة',
+          icon: 'error',
+          confirmButtonText: 'حسناً',
+          customClass: {
+            popup: 'mafya-swal',
+            title: 'mafya-swal-title',
+            htmlContainer: 'mafya-swal-html',
+            confirmButton: 'mafya-swal-confirm'
+          }
+        });
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        box.style.backgroundImage = `url(${ev.target.result})`;
+        box.style.backgroundSize = 'cover';
+        box.style.backgroundPosition = 'center';
+        box.textContent = '';
+        box.classList.add('has-img');
+        const sm = document.createElement('small');
+        sm.textContent = label || 'Deposit';
+        box.appendChild(sm);
+      };
+      reader.readAsDataURL(file);
+    }
+
+    const depositBox = document.getElementById('depositBox');
+    const depositInp = document.getElementById('depositShot');
+    const promoBox = document.getElementById('promoBox');
+    const promoInp = document.getElementById('promoShot');
+
+    setupUpload(depositBox, depositInp, 'Deposit');
+    setupUpload(promoBox, promoInp, 'Promocode');
+
+    const verifyBtn = document.getElementById('verifyBtn');
+    const loading = document.getElementById('loading');
+    const loadingText = document.getElementById('loadingText');
+    let verifying = false;
+
+    function wait(ms){ return new Promise(resolve => setTimeout(resolve, ms)); }
+    async function loadingStep(message, duration = 5000){
+      loadingText.textContent = message;
+      await wait(duration);
+    }
+
+    function showGamesDialog(){
+      const games = [
+        { name: 'لعبة الطيارة', img: 'https://logo12.gamer.gd/plane.png', fa: 'fa-plane', url: 'crash.html' },
+        { name: 'لعبة التفاحة', img: 'https://logo12.gamer.gd/apple.png', fa: 'fa-apple-alt', url: 'apple.html' },
+        { name: 'لعبة الجواهر', img: 'https://logo12.gamer.gd/gem.png', fa: 'fa-gem', url: 'gems.html' }
+      ];
+
+      Swal.fire({
+        title: '🎮 اختر اللعبة',
+        html: `
+          <div class="games-list">
+            ${games.map(g => `
+              <button type="button" class="game-row" data-url="${g.url}">
+                <span class="game-title">${g.name}</span>
+                <span class="game-ic"><img src="${g.img}" alt="" onerror="this.replaceWith(Object.assign(document.createElement('i'),{className:'fas ${g.fa}'}))"></span>
+              </button>
+            `).join('')}
+          </div>
+        `,
+        showConfirmButton: false,
+        showCloseButton: true,
+        customClass: {
+          popup: 'mafya-swal',
+          title: 'mafya-swal-title',
+          htmlContainer: 'mafya-swal-html'
+        },
+        didOpen: () => {
+          document.querySelectorAll('.game-row').forEach(btn => {
+            btn.addEventListener('click', () => {
+              window.location.href = btn.dataset.url;
+            });
+          });
+        }
+      });
+    }
+
+    if (new URLSearchParams(location.search).get('games') === '1'){
+      showGamesDialog();
+    }
+
+
+    verifyBtn.addEventListener('click', async () => {
+      if (verifying) return;
+      const userId = document.getElementById('userId').value.trim();
+      const dep = depositInp.files?.[0];
+      const promo = promoInp.files?.[0];
+
+      if (!userId){
+        Swal.fire({
+          title: 'خطأ',
+          text: 'من فضلك اكتب ID',
+          icon: 'error',
+          confirmButtonText: 'حسناً',
+          customClass: {
+            popup: 'mafya-swal',
+            title: 'mafya-swal-title',
+            htmlContainer: 'mafya-swal-html',
+            confirmButton: 'mafya-swal-confirm'
+          }
+        });
+        return;
+      }
+      if (!dep){
+        Swal.fire({
+          title: 'خطأ',
+          text: 'ارفع اسكرين الإيداع',
+          icon: 'error',
+          confirmButtonText: 'حسناً',
+          customClass: {
+            popup: 'mafya-swal',
+            title: 'mafya-swal-title',
+            htmlContainer: 'mafya-swal-html',
+            confirmButton: 'mafya-swal-confirm'
+          }
+        });
+        return;
+      }
+      if (!promo){
+        Swal.fire({
+          title: 'خطأ',
+          text: 'ارفع اسكرين البروموكود',
+          icon: 'error',
+          confirmButtonText: 'حسناً',
+          customClass: {
+            popup: 'mafya-swal',
+            title: 'mafya-swal-title',
+            htmlContainer: 'mafya-swal-html',
+            confirmButton: 'mafya-swal-confirm'
+          }
+        });
+        return;
+      }
+
+      verifying = true;
+      verifyBtn.disabled = true;
+      loading.classList.add('show');
+
+      try {
+        await loadingStep('جاري التحقق من انك قمت بعمل الإيداع المطلوب');
+        await loadingStep('جاري التحقق انك سجلت بالبروموكود المطلوب');
+        await loadingStep('جاري التحقق من سيرفرات المنصه');
+
+        await loadingStep('جاري تجهيز الألعاب المتاحة', 2000);
+        loading.classList.remove('show');
+
+        localStorage.setItem('pendingAutoFillID', userId);
+        localStorage.setItem('selected_platform', JSON.stringify({
+          name: platformName,
+          image: platformLogo,
+          platform_key: platformKey,
+          promocode: promocode
+        }));
+
+        showGamesDialog();
+
+      } catch(err) {
+        console.error(err);
+        loading.classList.remove('show');
+        Swal.fire({
+          title: 'خطأ',
+          text: 'حدث خطأ غير متوقع',
+          icon: 'error',
+          confirmButtonText: 'حسناً',
+          customClass: {
+            popup: 'mafya-swal',
+            title: 'mafya-swal-title',
+            htmlContainer: 'mafya-swal-html',
+            confirmButton: 'mafya-swal-confirm'
+          }
+        });
+      } finally {
+        verifying = false;
+        verifyBtn.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>

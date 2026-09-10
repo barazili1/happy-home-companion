@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover">
+    <title>MAFYA - مرحباً</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Almarai:wght@400;700;800&family=Orbitron:wght@700&family=Cinzel:wght@400;700;900&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #050B2E;
+            --accent: #A8E600;                         /* تم تغيير اللون */
+            --accent-dim: rgba(168, 230, 0, 0.15);     /* تم تغيير اللون */
+            --text: #fff;
+            --glow: 0 0 20px rgba(168, 230, 0, 0.7);   /* تم تغيير اللون */
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            width: 100%;
+            min-height: 100dvh;
+            background: var(--primary);
+            font-family: 'Almarai', sans-serif;
+            color: var(--text);
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* الخلفية الأصلية */
+        body {
+            background-image: url('back.gif');
+            background-size: cover;
+            background-attachment: fixed;
+            background-position: center;
+        }
+
+        /* إضافة ارتفاع 1px لتمكين السحب للتحديث */
+        body::after {
+            content: '';
+            display: block;
+            height: 1px;
+        }
+
+        /* الشاشة الرئيسية */
+        .splash-screen {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100dvh;
+            padding: 12px;
+        }
+
+        /* الصناديق العلوية */
+        .top-boxes {
+            position: absolute;
+            top: calc(12px + env(safe-area-inset-top));
+            left: 12px;
+            right: 12px;
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            z-index: 10;
+        }
+
+        .version-box, .login-online-box {
+            padding: 6px 12px;
+            background: rgba(0,0,0,0.15);
+            border-radius: 12px;
+            border: 1px solid var(--accent);
+            box-shadow: 0 0 12px rgba(168, 230, 0, 0.6);   /* تم تغيير اللون */
+            color: var(--text);
+            font-size: 11px;
+            white-space: nowrap;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            user-select: none;
+            font-family: 'Cinzel', 'Orbitron', monospace;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* ضبط اتجاه صندوق الفيرجن ليكون LTR */
+        .version-box {
+            direction: ltr;
+        }
+
+        .version-box span {
+            color: var(--accent);
+            text-shadow: 0 0 8px rgba(168, 230, 0, 0.6);   /* تم تغيير اللون */
+            font-weight: 800;
+        }
+
+        .login-online-box {
+            direction: ltr;
+        }
+
+        .login-online-box .dot {
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            background: var(--accent);
+            box-shadow: 0 0 14px rgba(168, 230, 0, 0.85);  /* تم تغيير اللون */
+            animation: pulseDot 1.2s ease-in-out infinite;
+            flex: 0 0 auto;
+        }
+
+        @keyframes pulseDot {
+            0%, 100% { transform: scale(1); opacity: .85; }
+            50% { transform: scale(1.4); opacity: 1; }
+        }
+
+        .login-online-box .online-count {
+            color: var(--accent);
+            text-shadow: 0 0 8px rgba(168, 230, 0, 0.6);   /* تم تغيير اللون */
+            font-weight: 800;
+        }
+
+        /* حاوية اللوجو مع حلقة التقدم */
+        .logo-wrapper {
+            position: relative;
+            width: 170px;
+            height: 170px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+
+        .logo-ring {
+            position: absolute;
+            inset: 0;
+            transform: rotate(-90deg);
+        }
+
+        .logo-ring .track,
+        .logo-ring .progress {
+            fill: none;
+            stroke-width: 4;
+            stroke-linecap: round;
+        }
+
+        .logo-ring .track { stroke: var(--accent-dim); }
+
+        .logo-ring .progress {
+            stroke: var(--accent);
+            stroke-dasharray: 439.82;
+            stroke-dashoffset: 439.82;
+            filter: drop-shadow(0 0 6px rgba(168, 230, 0, 0.8));
+            transition: stroke-dashoffset 0.1s linear;
+        }
+
+        .logo-frame {
+            width: 78%;
+            height: 78%;
+            border-radius: 50%;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(5,11,46,.6);
+            border: 2px solid rgba(168, 230, 0, 0.5);
+            box-shadow: 0 0 25px rgba(168, 230, 0, 0.35), inset 0 0 15px rgba(168, 230, 0, 0.2);
+            animation: logoFloat 3s ease-in-out infinite;
+        }
+
+        .logo-img {
+            width: 82%;
+            height: 82%;
+            object-fit: contain;
+            filter: drop-shadow(0 0 12px rgba(168, 230, 0, 0.6));
+        }
+
+        @keyframes logoFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+
+        /* شريط التحميل السفلي - مثبت في الأسفل */
+        .loading-bar-container {
+            position: absolute;
+            bottom: calc(12px + env(safe-area-inset-bottom));
+            left: 12px;
+            right: 12px;
+            width: auto;
+            max-width: none;
+            height: 6px;
+            background: rgba(168, 230, 0, 0.1);   /* تم تغيير اللون */
+            border-radius: 999px;
+            border: 1px solid rgba(168, 230, 0, 0.4);   /* تم تغيير اللون */
+            box-shadow: var(--glow);
+            overflow: hidden;
+        }
+
+        .loading-bar-progress {
+            width: 0%;
+            height: 100%;
+            background: var(--accent);
+            border-radius: 999px;
+            position: relative;
+            transition: width 0.1s linear;
+        }
+
+        .loading-bar-progress::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            animation: shimmer 1.5s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .percentage-counter {
+            position: absolute;
+            bottom: calc(30px + env(safe-area-inset-bottom));
+            left: 50%;
+            transform: translateX(-50%);
+            font-family: 'Cinzel', 'Orbitron', monospace;
+            font-size: 14px;
+            color: var(--accent);
+            text-shadow: var(--glow);
+            letter-spacing: 2px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- الشاشة الرئيسية -->
+    <div class="splash-screen">
+        <!-- الصناديق العلوية -->
+        <div class="top-boxes">
+            <div class="version-box">
+                Version <span>1.0.0</span>
+            </div>
+            <div class="login-online-box">
+                <span class="dot"></span>
+                <span>Users Online:</span>
+                <span id="splashUserCount" class="online-count">100</span>
+            </div>
+        </div>
+
+        <!-- حاوية اللوجو مع حلقة التقدم -->
+        <div class="logo-wrapper">
+            <svg class="logo-ring" width="170" height="170" viewBox="0 0 170 170">
+                <circle class="track" cx="85" cy="85" r="70"/>
+                <circle class="progress" id="progressRing" cx="85" cy="85" r="70"/>
+            </svg>
+            <div class="logo-frame">
+                <img src="logo.png" alt="MAFYA Logo" class="logo-img">
+            </div>
+        </div>
+
+        <!-- شريط التحميل السفلي -->
+        <div class="loading-bar-container">
+            <div id="loadingBarProgress" class="loading-bar-progress"></div>
+        </div>
+        <div id="percentageCounter" class="percentage-counter">0%</div>
+    </div>
+
+    <script>
+        /* منطق التحميل 10 ثوانٍ */
+        let counter = 0;
+        const totalTime = 10000;
+        const stepTime  = 100;
+        const step      = 100 / (totalTime / stepTime);
+
+        const progressRing = document.getElementById('progressRing');
+        const loadingBar   = document.getElementById('loadingBarProgress');
+        const percentageEl = document.getElementById('percentageCounter');
+
+        const circumference = 2 * Math.PI * 70;
+        progressRing.style.strokeDasharray = circumference;
+        progressRing.style.strokeDashoffset = circumference;
+
+        const loadingInterval = setInterval(() => {
+            counter += step;
+
+            if (counter >= 100) {
+                counter = 100;
+                clearInterval(loadingInterval);
+                window.location.href = 'platforms.html';
+            }
+
+            percentageEl.innerText = Math.floor(counter) + '%';
+            loadingBar.style.width = counter + '%';
+
+            const offset = circumference - (counter / 100) * circumference;
+            progressRing.style.strokeDashoffset = offset;
+        }, stepTime);
+
+        /* عدّاد المستخدمين المتصلين */
+        const onlineEl   = document.getElementById('splashUserCount');
+        const storageKey = 'onlineUserCount';
+
+        let userCount = 100;
+        onlineEl.innerText = userCount;
+
+        const onlineTimer = setInterval(() => {
+            userCount++;
+            onlineEl.innerText = userCount;
+            localStorage.setItem(storageKey, String(userCount));
+        }, 5000);
+
+        window.addEventListener('beforeunload', () => {
+            localStorage.setItem(storageKey, String(userCount));
+            clearInterval(onlineTimer);
+            clearInterval(loadingInterval);
+        });
+    </script>
+
+</body>
+</html>
